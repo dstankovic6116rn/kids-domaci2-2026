@@ -44,16 +44,43 @@ public class ChordState {
 	public static int chordHash(int value) {
 		return 61 * value % CHORD_SIZE;
 	}
-	
+
+	/**
+	 * Maps any integer key (e.g. itemId, or name.hashCode()) into the Chord
+	 * keyspace [0, CHORD_SIZE).  Uses floorMod so negative hash codes (which
+	 * Java's String.hashCode() can produce) still map to a positive slot.
+	 * Unlike chordHash above, this does NOT multiply by 61 — it is used for
+	 * ad/index keys, not for deriving a node's Chord ID from its port number.
+	 */
+	public static int keyHash(int rawKey) {
+		return Math.floorMod(rawKey, CHORD_SIZE);
+	}
+
 	private int chordLevel; //log_2(CHORD_SIZE)
-	
+
 	private ServentInfo[] successorTable;
 	private ServentInfo predecessorInfo;
-	
+
 	//we DO NOT use this to send messages, but only to construct the successor table
 	private List<ServentInfo> allNodeInfo;
-	
+
 	private Map<Integer, Integer> valueMap;
+
+	// Master copies of ads created by THIS node (key = itemId).
+	private final Map<Integer, Ad> myAds = new HashMap<>();
+
+	// Backup copies of ads whose Chord key (hash(itemId)) belongs to this node
+	// but whose owner is a different node.  Stored here for fault tolerance.
+	private final Map<Integer, Ad> backupAds = new HashMap<>();
+
+	// Secondary name index: maps hash(productName) -> list of NameIndexEntries.
+	// This node stores entries whose nameKey falls in its Chord key range,
+	// regardless of which node actually owns the ad.
+	private final Map<Integer, List<NameIndexEntry>> nameIndex = new HashMap<>();
+
+	// Guards the one-time [SYS-NEIGHBORS] print so it fires exactly once
+	// per node lifetime, as soon as both predecessor and successor are known.
+	private volatile boolean joinAnnounced = false;
 	
 	public ChordState() {
 		this.chordLevel = 1;
@@ -306,6 +333,113 @@ public class ChordState {
 		}
 		
 		updateSuccessorTable();
+
+		maybeAnnounceNeighbors();
+	}
+
+	/**
+	 * Called at the end of every addNodes() invocation.  Prints the
+	 * [SYS-NEIGHBORS] line exactly once — the first time this node knows both
+	 * its predecessor and its immediate successor (successorTable[0]).
+	 *
+	 * Why here: addNodes() is the single place where both pointers get updated.
+	 * It runs for the joining node (on wrap-around UPDATE) and for every
+	 * existing node that receives an UPDATE about a newcomer.  The joinAnnounced
+	 * flag makes the method idempotent after the first successful print.
+	 */
+	public synchronized void maybeAnnounceNeighbors() {
+		if (joinAnnounced) {
+			return;
+		}
+		if (predecessorInfo == null || successorTable[0] == null) {
+			return;
+		}
+		joinAnnounced = true;
+		int myId = AppConfig.myServentInfo.getChordId();
+		int predId = predecessorInfo.getChordId();
+		int succId = successorTable[0].getChordId();
+		AppConfig.timestampedStandardPrint("[SYS-NEIGHBORS] my_id:" + myId
+				+ " neighbors:" + predId + "," + succId + ";");
+	}
+
+	/** Stores the master copy of an ad created by this node. */
+	public void registerMyAd(Ad ad) {
+		synchronized (myAds) {
+			myAds.put(ad.getItemId(), ad);
+		}
+	}
+
+	/** Retrieves a master ad by itemId, or null if not found. */
+	public Ad getMyAd(int itemId) {
+		synchronized (myAds) {
+			return myAds.get(itemId);
+		}
+	}
+
+	/**
+	 * Stores a backup copy of someone else's ad.  This node is responsible for
+	 * the backup because hash(ad.itemId) falls in its Chord key range.
+	 */
+	public void storeBackupAd(Ad ad) {
+		synchronized (backupAds) {
+			backupAds.put(ad.getItemId(), ad);
+		}
+	}
+
+	/** Retrieves a backup ad by itemId, or null if not found. */
+	public Ad getBackupAd(int itemId) {
+		synchronized (backupAds) {
+			return backupAds.get(itemId);
+		}
+	}
+
+	/**
+	 * Appends a NameIndexEntry to the list stored under nameKey.
+	 * Called when this node is the DHT owner of hash(productName).
+	 * computeIfAbsent creates a new list on the first insertion for a key.
+	 */
+	public void appendNameIndex(int nameKey, NameIndexEntry entry) {
+		synchronized (nameIndex) {
+			nameIndex.computeIfAbsent(nameKey, k -> new ArrayList<>()).add(entry);
+		}
+	}
+
+	/**
+	 * Returns a snapshot of all NameIndexEntries stored under nameKey.
+	 * Returns an empty list if nothing is stored yet.
+	 * A copy is returned so callers don't need to hold the lock while iterating.
+	 */
+	public List<NameIndexEntry> getNameIndex(int nameKey) {
+		synchronized (nameIndex) {
+			List<NameIndexEntry> list = nameIndex.get(nameKey);
+			if (list == null) {
+				return new ArrayList<>();
+			}
+			return new ArrayList<>(list);
+		}
+	}
+
+	/**
+	 * Best-effort local duplicate check for itemId.
+	 * Checks myAds, backupAds, and every nameIndex entry this node holds.
+	 * This is local-only — it cannot detect duplicates registered on other nodes.
+	 * Used by ListItemCommand to reject obvious duplicates before creating an ad.
+	 */
+	public boolean knowsItemId(int itemId) {
+		synchronized (myAds) {
+			if (myAds.containsKey(itemId)) return true;
+		}
+		synchronized (backupAds) {
+			if (backupAds.containsKey(itemId)) return true;
+		}
+		synchronized (nameIndex) {
+			for (List<NameIndexEntry> list : nameIndex.values()) {
+				for (NameIndexEntry e : list) {
+					if (e.getItemId() == itemId) return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	/**

@@ -1,3 +1,4 @@
+pause 50000
+search apple
 pause 30000
-pause 10000
 stop

@@ -1,5 +1,4 @@
+pause 50000
+list_item 200 apple 3
 pause 40000
-pause 5000
-dht_get 2
-pause 5000
 stop

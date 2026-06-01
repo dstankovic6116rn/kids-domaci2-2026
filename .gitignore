@@ -1,0 +1,28 @@
+# Build output
+out/
+build/
+target/
+*.class
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml.bak
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+
+# VS Code
+.vscode/
+
+# Logs / runtime output
+chord/output/
+chord/error/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db

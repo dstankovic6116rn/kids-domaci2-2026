@@ -9,11 +9,17 @@ import java.util.concurrent.Executors;
 
 import app.AppConfig;
 import app.Cancellable;
+import servent.handler.AdFetchHandler;
+import servent.handler.AdFetchReplyHandler;
 import servent.handler.AskGetHandler;
+import servent.handler.ListItemBackupHandler;
+import servent.handler.ListItemIndexHandler;
 import servent.handler.MessageHandler;
 import servent.handler.NewNodeHandler;
 import servent.handler.NullHandler;
 import servent.handler.PutHandler;
+import servent.handler.SearchLookupHandler;
+import servent.handler.SearchLookupReplyHandler;
 import servent.handler.SorryHandler;
 import servent.handler.TellGetHandler;
 import servent.handler.UpdateHandler;
@@ -86,6 +92,24 @@ public class SimpleServentListener implements Runnable, Cancellable {
 					break;
 				case TELL_GET:
 					messageHandler = new TellGetHandler(clientMessage);
+					break;
+				case LIST_ITEM_BACKUP:
+					messageHandler = new ListItemBackupHandler(clientMessage);
+					break;
+				case LIST_ITEM_INDEX:
+					messageHandler = new ListItemIndexHandler(clientMessage);
+					break;
+				case SEARCH_LOOKUP:
+					messageHandler = new SearchLookupHandler(clientMessage);
+					break;
+				case SEARCH_LOOKUP_REPLY:
+					messageHandler = new SearchLookupReplyHandler(clientMessage);
+					break;
+				case AD_FETCH:
+					messageHandler = new AdFetchHandler(clientMessage);
+					break;
+				case AD_FETCH_REPLY:
+					messageHandler = new AdFetchReplyHandler(clientMessage);
 					break;
 				case POISON:
 					break;

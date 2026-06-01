@@ -1,4 +1,6 @@
-pause 50000
-dht_put 2 5
+pause 60000
+list_item 100 apple 5
 pause 10000
+search apple
+pause 30000
 stop

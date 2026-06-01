@@ -1,19 +1,12 @@
-11:34:42 - Starting servent [4|localhost|1300]
-11:34:42 - Pausing for 30000 ms
-11:34:43 - Sending message [4|1300|0||NEW_NODE|1100|28]
-11:34:44 - Got message [28|1100|2||WELCOME|1300|4]
-11:34:45 - Sending message [4|1300|1||UPDATE|1100|28]
-11:34:47 - Got message [4|1300|2|1100,1200|UPDATE|1300|4]
-11:34:55 - Got message [24|1400|3||NEW_NODE|1300|4]
-11:34:57 - Sending message [24|1400|2||NEW_NODE|1100|28]
-11:35:01 - Got message [24|1400|4|1100,1200|UPDATE|1300|4]
-11:35:02 - Sending message [24|1400|3|1100,1200,1300|UPDATE|1400|24]
-11:35:06 - Got message [0|1600|5||NEW_NODE|1300|4]
-11:35:07 - Sending message [4|1300|4||WELCOME|1600|0]
-11:35:08 - Got message [0|1600|1||UPDATE|1300|4]
-11:35:10 - Sending message [0|1600|5|1300|UPDATE|1400|24]
-11:35:12 - Pausing for 10000 ms
-11:35:16 - Got message [0|1600|2|2:5|PUT|1300|4]
-11:35:18 - Got message [48|1200|4|2|ASK_GET|1300|4]
-11:35:20 - Sending message [4|1300|6|2:5|TELL_GET|1200|48]
-11:35:22 - Stopping...
+14:09:39 - Starting servent [4|localhost|1300]
+14:09:39 - Pausing for 20000 ms
+14:09:41 - Sending message [4|1300|0||NEW_NODE|1100|28]
+14:09:42 - Got message [28|1100|2||WELCOME|1300|4]
+14:09:43 - Sending message [4|1300|1||UPDATE|1100|28]
+14:09:44 - Got message [4|1300|4|1100,1200|UPDATE|1300|4]
+14:09:44 - [SYS-NEIGHBORS] my_id:4 neighbors:48,28;
+14:09:51 - Got message [24|1400|5||NEW_NODE|1300|4]
+14:09:52 - Sending message [24|1400|2||NEW_NODE|1100|28]
+14:09:59 - Pausing for 15000 ms
+14:10:00 - Sending message [4|1300|3||SEARCH_LOOKUP|1100|28]
+14:10:14 - Stopping...
