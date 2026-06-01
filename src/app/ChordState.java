@@ -5,12 +5,16 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import servent.message.AskGetMessage;
+import servent.message.MarketNotificationMessage;
 import servent.message.PutMessage;
 import servent.message.WelcomeMessage;
 import servent.message.util.MessageUtil;
@@ -81,6 +85,12 @@ public class ChordState {
 	// Guards the one-time [SYS-NEIGHBORS] print so it fires exactly once
 	// per node lifetime, as soon as both predecessor and successor are known.
 	private volatile boolean joinAnnounced = false;
+
+	// Nodes that have subscribed to THIS node's listings.
+	// LinkedHashSet: insertion-ordered, no duplicates.
+	// synchronizedSet: safe for concurrent access from handler threads.
+	private final Set<ServentInfo> subscribers =
+			Collections.synchronizedSet(new LinkedHashSet<>());
 	
 	public ChordState() {
 		this.chordLevel = 1;
@@ -440,6 +450,43 @@ public class ChordState {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Registers a new subscriber for this node's listings.
+	 * Called by SubscribeRequestHandler when another node sends SUBSCRIBE_REQUEST here.
+	 * Set semantics mean duplicate subscriptions from the same port are ignored.
+	 */
+	public void addSubscriber(ServentInfo subscriber) {
+		subscribers.add(subscriber);
+	}
+
+	/**
+	 * Returns a snapshot of current subscribers so the caller can iterate
+	 * without holding the internal lock (avoids deadlock with sendMessage).
+	 */
+	public Set<ServentInfo> getSubscribers() {
+		synchronized (subscribers) {
+			return new LinkedHashSet<>(subscribers);
+		}
+	}
+
+	/**
+	 * Sends a MARKET_NOTIFICATION to every subscriber except self.
+	 * Called by ListItemCommand after registerMyAd, before printing [MARKET-LIST].
+	 * Each send is non-blocking (DelayedMessageSender spawns a thread per message).
+	 */
+	public void notifySubscribers(Ad ad) {
+		int myPort = AppConfig.myServentInfo.getListenerPort();
+		int myChordId = AppConfig.myServentInfo.getChordId();
+		for (ServentInfo sub : getSubscribers()) {
+			if (sub.getListenerPort() == myPort) {
+				continue; // skip self-subscription — [MARKET-LIST] already confirms locally
+			}
+			MarketNotificationMessage msg =
+					new MarketNotificationMessage(myPort, sub.getListenerPort(), myChordId, ad.getItemId());
+			MessageUtil.sendMessage(msg);
+		}
 	}
 
 	/**

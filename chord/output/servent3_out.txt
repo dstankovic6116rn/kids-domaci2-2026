@@ -1,4 +1,15 @@
-14:09:49 - Starting servent [24|localhost|1400]
-14:09:49 - Pausing for 35000 ms
-14:09:50 - Sending message [24|1400|0||NEW_NODE|1200|48]
-14:10:24 - Stopping...
+18:54:27 - Starting servent [24|localhost|1400]
+18:54:27 - Pausing for 70000 ms
+18:54:28 - Sending message [24|1400|0||NEW_NODE|1100|28]
+18:54:29 - Got message [28|1100|4||WELCOME|1400|24]
+18:54:30 - Sending message [24|1400|1||UPDATE|1100|28]
+18:54:33 - Got message [24|1400|2|1100,1200,1300|UPDATE|1400|24]
+18:54:33 - [SYS-NEIGHBORS] my_id:24 neighbors:4,28;
+18:54:39 - Got message [0|1600|0||NEW_NODE|1400|24]
+18:54:40 - Sending message [0|1600|2||NEW_NODE|1100|28]
+18:54:44 - Got message [0|1600|4|1300|UPDATE|1400|24]
+18:54:45 - Sending message [0|1600|3|1300,1400|UPDATE|1100|28]
+18:55:07 - Got message [0|1600|2||LIST_ITEM_INDEX|1400|24]
+18:55:08 - Sending message [24|1400|4||LIST_ITEM_INDEX|1100|28]
+18:55:09 - Got message [4|1300|6||LIST_ITEM_BACKUP|1400|24]
+18:55:37 - Stopping...

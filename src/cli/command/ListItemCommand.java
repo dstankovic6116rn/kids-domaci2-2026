@@ -82,6 +82,10 @@ public class ListItemCommand implements CLICommand {
 		// Step 2: store master copy locally.
 		AppConfig.chordState.registerMyAd(ad);
 
+		// Step 2b: notify all subscribers that this node has a new listing.
+		// Runs before [MARKET-LIST] print; sends are non-blocking (each spawns a thread).
+		AppConfig.chordState.notifySubscribers(ad);
+
 		// Step 3: route backup to the node responsible for hash(itemId).
 		int itemKey = ChordState.keyHash(itemId);
 		if (AppConfig.chordState.isKeyMine(itemKey)) {

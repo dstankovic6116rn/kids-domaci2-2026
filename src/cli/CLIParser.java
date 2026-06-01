@@ -14,6 +14,7 @@ import cli.command.ListItemCommand;
 import cli.command.PauseCommand;
 import cli.command.SearchCommand;
 import cli.command.StopCommand;
+import cli.command.SubscribeCommand;
 import cli.command.SuccessorInfo;
 import servent.SimpleServentListener;
 
@@ -51,6 +52,7 @@ public class CLIParser implements Runnable, Cancellable {
 		commandList.add(new DHTPutCommand());
 		commandList.add(new ListItemCommand());
 		commandList.add(new SearchCommand());
+		commandList.add(new SubscribeCommand());
 		commandList.add(new StopCommand(this, listener));
 	}
 	

@@ -14,6 +14,7 @@ import servent.handler.AdFetchReplyHandler;
 import servent.handler.AskGetHandler;
 import servent.handler.ListItemBackupHandler;
 import servent.handler.ListItemIndexHandler;
+import servent.handler.MarketNotificationHandler;
 import servent.handler.MessageHandler;
 import servent.handler.NewNodeHandler;
 import servent.handler.NullHandler;
@@ -21,6 +22,7 @@ import servent.handler.PutHandler;
 import servent.handler.SearchLookupHandler;
 import servent.handler.SearchLookupReplyHandler;
 import servent.handler.SorryHandler;
+import servent.handler.SubscribeRequestHandler;
 import servent.handler.TellGetHandler;
 import servent.handler.UpdateHandler;
 import servent.handler.WelcomeHandler;
@@ -110,6 +112,12 @@ public class SimpleServentListener implements Runnable, Cancellable {
 					break;
 				case AD_FETCH_REPLY:
 					messageHandler = new AdFetchReplyHandler(clientMessage);
+					break;
+				case SUBSCRIBE_REQUEST:
+					messageHandler = new SubscribeRequestHandler(clientMessage);
+					break;
+				case MARKET_NOTIFICATION:
+					messageHandler = new MarketNotificationHandler(clientMessage);
 					break;
 				case POISON:
 					break;

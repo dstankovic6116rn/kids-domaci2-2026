@@ -32,6 +32,18 @@ public class ServentInfo implements Serializable {
 		return chordId;
 	}
 	
+	// Two ServentInfo instances are equal if they share the same listener port.
+	// All nodes run on localhost, so port uniquely identifies a node.
+	@Override
+	public boolean equals(Object o) {
+		return o instanceof ServentInfo && ((ServentInfo) o).listenerPort == this.listenerPort;
+	}
+
+	@Override
+	public int hashCode() {
+		return listenerPort;
+	}
+
 	@Override
 	public String toString() {
 		return "[" + chordId + "|" + ipAddress + "|" + listenerPort + "]";
