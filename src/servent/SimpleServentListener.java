@@ -12,10 +12,17 @@ import app.Cancellable;
 import servent.handler.AdFetchHandler;
 import servent.handler.AdFetchReplyHandler;
 import servent.handler.AskGetHandler;
+import servent.handler.BackupQtyUpdateHandler;
+import servent.handler.BuyExecHandler;
+import servent.handler.BuyExecReplyHandler;
+import servent.handler.BuyOwnerLookupHandler;
+import servent.handler.BuyOwnerReplyHandler;
 import servent.handler.ListItemBackupHandler;
 import servent.handler.ListItemIndexHandler;
 import servent.handler.MarketNotificationHandler;
 import servent.handler.MessageHandler;
+import servent.handler.MutexRequestHandler;
+import servent.handler.MutexTokenHandler;
 import servent.handler.NewNodeHandler;
 import servent.handler.NullHandler;
 import servent.handler.PutHandler;
@@ -118,6 +125,27 @@ public class SimpleServentListener implements Runnable, Cancellable {
 					break;
 				case MARKET_NOTIFICATION:
 					messageHandler = new MarketNotificationHandler(clientMessage);
+					break;
+				case BUY_OWNER_LOOKUP:
+					messageHandler = new BuyOwnerLookupHandler(clientMessage);
+					break;
+				case BUY_OWNER_REPLY:
+					messageHandler = new BuyOwnerReplyHandler(clientMessage);
+					break;
+				case MUTEX_REQUEST:
+					messageHandler = new MutexRequestHandler(clientMessage);
+					break;
+				case MUTEX_TOKEN:
+					messageHandler = new MutexTokenHandler(clientMessage);
+					break;
+				case BUY_EXEC:
+					messageHandler = new BuyExecHandler(clientMessage);
+					break;
+				case BUY_EXEC_REPLY:
+					messageHandler = new BuyExecReplyHandler(clientMessage);
+					break;
+				case BACKUP_QTY_UPDATE:
+					messageHandler = new BackupQtyUpdateHandler(clientMessage);
 					break;
 				case POISON:
 					break;

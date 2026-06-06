@@ -1,2 +1,4 @@
-pause 70000
+pause 65000
+buy 100 1
+pause 20000
 stop

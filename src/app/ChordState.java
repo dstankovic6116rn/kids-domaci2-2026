@@ -14,7 +14,13 @@ import java.util.Map;
 import java.util.Set;
 
 import servent.message.AskGetMessage;
+import servent.message.BackupQtyUpdateMessage;
+import servent.message.BuyExecMessage;
+import servent.message.BuyExecReplyMessage;
+import servent.message.BuyOwnerLookupMessage;
 import servent.message.MarketNotificationMessage;
+import servent.message.MutexRequestMessage;
+import servent.message.MutexTokenMessage;
 import servent.message.PutMessage;
 import servent.message.WelcomeMessage;
 import servent.message.util.MessageUtil;
@@ -91,6 +97,11 @@ public class ChordState {
 	// synchronizedSet: safe for concurrent access from handler threads.
 	private final Set<ServentInfo> subscribers =
 			Collections.synchronizedSet(new LinkedHashSet<>());
+
+	// Per-item Suzuki-Kasami state.  One entry per itemId this node knows
+	// about.  Entries are created lazily on first need (incoming REQUEST
+	// for an unknown item, owner listing, or local buy attempt).
+	private final Map<Integer, ItemMutexState> mutexStates = new HashMap<>();
 	
 	public ChordState() {
 		this.chordLevel = 1;
@@ -468,6 +479,322 @@ public class ChordState {
 	public Set<ServentInfo> getSubscribers() {
 		synchronized (subscribers) {
 			return new LinkedHashSet<>(subscribers);
+		}
+	}
+
+	// =================================================================
+	// Suzuki-Kasami distributed mutex (one token per item) — buy flow.
+	// =================================================================
+
+	/**
+	 * Returns the per-item mutex state, creating it lazily.  Callers
+	 * MUST synchronize on the returned object for the duration of any
+	 * compound operation (e.g. checking and modifying multiple fields).
+	 */
+	public ItemMutexState getOrCreateMutexState(int itemId) {
+		synchronized (mutexStates) {
+			return mutexStates.computeIfAbsent(itemId, k -> new ItemMutexState());
+		}
+	}
+
+	/**
+	 * Called by ListItemCommand when this node lists a new item, so the
+	 * item's Suzuki-Kasami token is born here (the owner is the natural
+	 * initial token holder).  Idempotent.
+	 */
+	public void initOwnerToken(int itemId) {
+		ItemMutexState state = getOrCreateMutexState(itemId);
+		synchronized (state) {
+			if (state.heldToken == null) {
+				state.heldToken = new MutexToken(itemId);
+			}
+		}
+	}
+
+	/**
+	 * Returns a snapshot of all OTHER node infos this node currently knows
+	 * about, used by the buyer to broadcast MUTEX_REQUEST to the group.
+	 * Excludes self.
+	 */
+	public List<ServentInfo> getAllOtherNodes() {
+		synchronized (allNodeInfo) {
+			return new ArrayList<>(allNodeInfo);
+		}
+	}
+
+	/**
+	 * Entry point from BuyCommand: this node wants to buy `qty` of `itemId`.
+	 * Owner port discovery happens in the command itself (via owner lookup
+	 * or local check); by the time we get here, knownOwnerPort is set on the
+	 * state.
+	 *
+	 * Prints [MUTEX-REQUEST] item_id:X and either:
+	 *   - if we already hold the token: enters CS immediately.
+	 *   - else: broadcasts MUTEX_REQUEST to every other known node and
+	 *     waits for the token to arrive.
+	 */
+	public void requestBuyMutex(int itemId, int qty, int ownerPort) {
+		ItemMutexState state = getOrCreateMutexState(itemId);
+		int myPort = AppConfig.myServentInfo.getListenerPort();
+		boolean enterNow;
+		int seqToBroadcast = 0;
+		synchronized (state) {
+			state.myPendingQty = qty;
+			state.knownOwnerPort = ownerPort;
+			state.myRequestPending = true;
+			state.mySeq++;
+			state.RN.put(myPort, state.mySeq);
+			seqToBroadcast = state.mySeq;
+			enterNow = (state.heldToken != null);
+		}
+		AppConfig.timestampedStandardPrint("[MUTEX-REQUEST] item_id:" + itemId);
+		if (enterNow) {
+			enterCS(itemId);
+		} else {
+			// Broadcast REQUEST to every other node.
+			for (ServentInfo n : getAllOtherNodes()) {
+				MessageUtil.sendMessage(new MutexRequestMessage(
+						myPort, n.getListenerPort(), itemId, myPort, seqToBroadcast));
+			}
+		}
+	}
+
+	/**
+	 * Suzuki-Kasami REQUEST receipt:
+	 *  1. RN[from] = max(RN[from], seq).
+	 *  2. If we hold the token, are not in CS, and the requester's seq is
+	 *     exactly LN[from]+1, forward the token to them.
+	 */
+	public void handleMutexRequest(int itemId, int fromPort, int seq) {
+		ItemMutexState state = getOrCreateMutexState(itemId);
+		MutexToken tokenToSend = null;
+		synchronized (state) {
+			int known = state.RN.getOrDefault(fromPort, 0);
+			if (seq > known) {
+				state.RN.put(fromPort, seq);
+			}
+			if (state.heldToken != null && !state.inCS && !state.myRequestPending) {
+				int lnFrom = state.heldToken.getLN().getOrDefault(fromPort, 0);
+				int rnFrom = state.RN.get(fromPort);
+				if (rnFrom == lnFrom + 1) {
+					tokenToSend = state.heldToken;
+					state.heldToken = null;
+				}
+			}
+		}
+		if (tokenToSend != null) {
+			MessageUtil.sendMessage(new MutexTokenMessage(
+					AppConfig.myServentInfo.getListenerPort(), fromPort, tokenToSend));
+		}
+	}
+
+	/**
+	 * Token arrived: store it, and if we still have a pending request,
+	 * enter the CS.  (If the request was already served — shouldn't happen
+	 * in a correct Suzuki-Kasami run — we just hold the token.)
+	 */
+	public void handleTokenReceived(int itemId, MutexToken token) {
+		ItemMutexState state = getOrCreateMutexState(itemId);
+		boolean shouldEnter;
+		synchronized (state) {
+			state.heldToken = token;
+			shouldEnter = state.myRequestPending && !state.inCS;
+		}
+		if (shouldEnter) {
+			enterCS(itemId);
+		}
+	}
+
+	/**
+	 * Enters the critical section for `itemId`.  Prints [MUTEX-ACQUIRED]
+	 * then either executes the buy locally (if owner == self) or sends
+	 * BUY_EXEC to the owner.  Either way, exitCS is the final step —
+	 * called directly here for the local path, or by BuyExecReplyHandler
+	 * for the remote path.
+	 */
+	private void enterCS(int itemId) {
+		ItemMutexState state = getOrCreateMutexState(itemId);
+		int myPort = AppConfig.myServentInfo.getListenerPort();
+		int ownerPort;
+		int qty;
+		synchronized (state) {
+			state.inCS = true;
+			ownerPort = state.knownOwnerPort;
+			qty = state.myPendingQty;
+		}
+		AppConfig.timestampedStandardPrint("[MUTEX-ACQUIRED]");
+
+		if (ownerPort == myPort) {
+			// Local buy — operate directly on myAds and exit CS synchronously.
+			Ad existing = getMyAd(itemId);
+			if (existing != null && existing.getQty() >= qty) {
+				int newQty = existing.getQty() - qty;
+				Ad updated = new Ad(existing.getItemId(), existing.getName(), newQty,
+						existing.getOwnerId(), existing.getOwnerPort());
+				registerMyAd(updated);
+				// Sync backup with the new quantity.
+				int itemKey = keyHash(itemId);
+				if (isKeyMine(itemKey)) {
+					Ad bkp = getBackupAd(itemId);
+					if (bkp != null) {
+						storeBackupAd(updated);
+					}
+				} else {
+					ServentInfo next = getNextNodeForKey(itemKey);
+					MessageUtil.sendMessage(new BackupQtyUpdateMessage(
+							myPort, next.getListenerPort(), itemId, newQty));
+				}
+				AppConfig.timestampedStandardPrint("[MARKET-BUY-SUCCESS] item_id:" + itemId
+						+ " qty_bought:" + qty + " remaining_qty:" + newQty);
+			} else {
+				AppConfig.timestampedStandardPrint("[MARKET-BUY-FAIL] item_id:" + itemId
+						+ " reason:OUT_OF_STOCK");
+			}
+			exitCS(itemId);
+		} else {
+			// Remote buy — owner will reply via BUY_EXEC_REPLY.
+			MessageUtil.sendMessage(new BuyExecMessage(myPort, ownerPort, itemId, qty, myPort));
+		}
+	}
+
+	/**
+	 * Called by BuyExecReplyHandler when the owner has responded.
+	 * Prints success/fail and exits the CS.
+	 */
+	public void handleBuyExecReply(int itemId, boolean success, int qtyBought, int remainingQty) {
+		if (success) {
+			AppConfig.timestampedStandardPrint("[MARKET-BUY-SUCCESS] item_id:" + itemId
+					+ " qty_bought:" + qtyBought + " remaining_qty:" + remainingQty);
+		} else {
+			AppConfig.timestampedStandardPrint("[MARKET-BUY-FAIL] item_id:" + itemId
+					+ " reason:OUT_OF_STOCK");
+		}
+		exitCS(itemId);
+	}
+
+	/**
+	 * Suzuki-Kasami EXIT:
+	 *   1. token.LN[me] = mySeq.
+	 *   2. For each k known via RN: if k not in Q and RN[k] == LN[k]+1, add k to Q.
+	 *   3. If Q non-empty: pop head, send token there (release ownership).
+	 *      Else: keep the token for the next requester.
+	 *   4. Print [MUTEX-RELEASED].
+	 */
+	private void exitCS(int itemId) {
+		ItemMutexState state = getOrCreateMutexState(itemId);
+		int myPort = AppConfig.myServentInfo.getListenerPort();
+		MutexToken tokenToForward = null;
+		int forwardTo = -1;
+		synchronized (state) {
+			if (state.heldToken == null) {
+				// Shouldn't happen — we were in CS, so we held the token.
+				AppConfig.timestampedErrorPrint("exitCS called without holding token for item " + itemId);
+				state.inCS = false;
+				state.myRequestPending = false;
+				state.myPendingQty = 0;
+				AppConfig.timestampedStandardPrint("[MUTEX-RELEASED]");
+				return;
+			}
+			state.heldToken.getLN().put(myPort, state.mySeq);
+			// Add fresh requesters to Q.
+			for (Map.Entry<Integer, Integer> entry : state.RN.entrySet()) {
+				int port = entry.getKey();
+				int rn = entry.getValue();
+				if (port == myPort) continue;
+				int ln = state.heldToken.getLN().getOrDefault(port, 0);
+				if (rn == ln + 1 && !state.heldToken.getQ().contains(port)) {
+					state.heldToken.getQ().add(port);
+				}
+			}
+			state.inCS = false;
+			state.myRequestPending = false;
+			state.myPendingQty = 0;
+			if (!state.heldToken.getQ().isEmpty()) {
+				forwardTo = state.heldToken.getQ().poll();
+				tokenToForward = state.heldToken;
+				state.heldToken = null;
+			}
+		}
+		if (tokenToForward != null) {
+			MessageUtil.sendMessage(new MutexTokenMessage(myPort, forwardTo, tokenToForward));
+		}
+		AppConfig.timestampedStandardPrint("[MUTEX-RELEASED]");
+	}
+
+	/**
+	 * Owner-side execution of a buy request (BUY_EXEC).  Atomically checks
+	 * the master quantity, decrements if sufficient, and replies to the
+	 * buyer.  Also fires a BACKUP_QTY_UPDATE so the replica stays in sync.
+	 */
+	public void executeBuyAtOwner(int itemId, int qty, int buyerPort) {
+		Ad existing = getMyAd(itemId);
+		int myPort = AppConfig.myServentInfo.getListenerPort();
+		if (existing == null) {
+			MessageUtil.sendMessage(new BuyExecReplyMessage(myPort, buyerPort, itemId, qty, 0, false));
+			return;
+		}
+		if (existing.getQty() >= qty) {
+			int newQty = existing.getQty() - qty;
+			Ad updated = new Ad(existing.getItemId(), existing.getName(), newQty,
+					existing.getOwnerId(), existing.getOwnerPort());
+			registerMyAd(updated);
+			// Propagate the new qty to the backup copy.
+			int itemKey = keyHash(itemId);
+			if (isKeyMine(itemKey)) {
+				if (getBackupAd(itemId) != null) {
+					storeBackupAd(updated);
+				}
+			} else {
+				ServentInfo next = getNextNodeForKey(itemKey);
+				MessageUtil.sendMessage(new BackupQtyUpdateMessage(
+						myPort, next.getListenerPort(), itemId, newQty));
+			}
+			MessageUtil.sendMessage(new BuyExecReplyMessage(
+					myPort, buyerPort, itemId, qty, newQty, true));
+		} else {
+			MessageUtil.sendMessage(new BuyExecReplyMessage(
+					myPort, buyerPort, itemId, qty, existing.getQty(), false));
+		}
+	}
+
+	/**
+	 * Routed via Chord to the backup node, where it overwrites the backup
+	 * ad's qty.  Used to keep the backup copy in sync with the master after
+	 * a successful buy.
+	 */
+	public void handleBackupQtyUpdate(int itemId, int newQty) {
+		int itemKey = keyHash(itemId);
+		int myPort = AppConfig.myServentInfo.getListenerPort();
+		if (isKeyMine(itemKey)) {
+			Ad bkp = getBackupAd(itemId);
+			if (bkp != null) {
+				Ad updated = new Ad(bkp.getItemId(), bkp.getName(), newQty,
+						bkp.getOwnerId(), bkp.getOwnerPort());
+				storeBackupAd(updated);
+			}
+		} else {
+			ServentInfo next = getNextNodeForKey(itemKey);
+			MessageUtil.sendMessage(new BackupQtyUpdateMessage(
+					myPort, next.getListenerPort(), itemId, newQty));
+		}
+	}
+
+	/**
+	 * BuyOwnerLookupHandler entry point: if we hold the backup, reply with
+	 * the owner port; otherwise forward the lookup one hop closer.
+	 */
+	public void handleBuyOwnerLookup(int itemId, int originPort) {
+		int itemKey = keyHash(itemId);
+		int myPort = AppConfig.myServentInfo.getListenerPort();
+		if (isKeyMine(itemKey)) {
+			Ad bkp = getBackupAd(itemId);
+			int ownerPort = (bkp != null) ? bkp.getOwnerPort() : -1;
+			MessageUtil.sendMessage(new servent.message.BuyOwnerReplyMessage(
+					myPort, originPort, itemId, ownerPort));
+		} else {
+			ServentInfo next = getNextNodeForKey(itemKey);
+			MessageUtil.sendMessage(new BuyOwnerLookupMessage(
+					myPort, next.getListenerPort(), itemId, originPort));
 		}
 	}
 

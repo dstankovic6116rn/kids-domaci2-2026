@@ -82,6 +82,12 @@ public class ListItemCommand implements CLICommand {
 		// Step 2: store master copy locally.
 		AppConfig.chordState.registerMyAd(ad);
 
+		// Step 2a: initialise the Suzuki-Kasami token for this item right here
+		// at the owner.  The owner is the natural initial token holder; other
+		// nodes will discover the token's existence implicitly when they
+		// broadcast MUTEX_REQUEST and the owner forwards the token to them.
+		AppConfig.chordState.initOwnerToken(itemId);
+
 		// Step 2b: notify all subscribers that this node has a new listing.
 		// Runs before [MARKET-LIST] print; sends are non-blocking (each spawns a thread).
 		AppConfig.chordState.notifySubscribers(ad);
