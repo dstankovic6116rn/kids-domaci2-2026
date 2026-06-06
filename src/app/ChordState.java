@@ -390,6 +390,29 @@ public class ChordState {
 		}
 	}
 
+	/**
+	 * Atomic check-and-decrement of a master ad's quantity.  Both the qty
+	 * check and the update happen inside a single synchronized block on
+	 * the myAds map, so concurrent BUY_EXEC handlers can never decrement
+	 * stock below zero even if (hypothetically) the mutex layer ever
+	 * admitted two CS holders at once.  Defence-in-depth for issue #2.
+	 *
+	 * Returns the updated Ad on success, or null if there isn't enough
+	 * stock or the ad isn't present.
+	 */
+	public Ad tryDecrementMyAd(int itemId, int qty) {
+		synchronized (myAds) {
+			Ad existing = myAds.get(itemId);
+			if (existing == null || existing.getQty() < qty) {
+				return null;
+			}
+			Ad updated = new Ad(existing.getItemId(), existing.getName(),
+					existing.getQty() - qty, existing.getOwnerId(), existing.getOwnerPort());
+			myAds.put(itemId, updated);
+			return updated;
+		}
+	}
+
 	/** Retrieves a master ad by itemId, or null if not found. */
 	public Ad getMyAd(int itemId) {
 		synchronized (myAds) {
@@ -548,14 +571,17 @@ public class ChordState {
 			enterNow = (state.heldToken != null);
 		}
 		AppConfig.timestampedStandardPrint("[MUTEX-REQUEST] item_id:" + itemId);
+		// Always broadcast REQUEST to every other node — even if we hold the
+		// token, peers must update their RN so they correctly enqueue us
+		// next time they hold the token.  (Without this, our request would
+		// be invisible to the network.)
+		for (ServentInfo n : getAllOtherNodes()) {
+			MessageUtil.sendMessage(new MutexRequestMessage(
+					myPort, n.getListenerPort(), itemId, myPort, seqToBroadcast));
+		}
+		// If we already hold the token, no need to wait — enter CS in parallel.
 		if (enterNow) {
 			enterCS(itemId);
-		} else {
-			// Broadcast REQUEST to every other node.
-			for (ServentInfo n : getAllOtherNodes()) {
-				MessageUtil.sendMessage(new MutexRequestMessage(
-						myPort, n.getListenerPort(), itemId, myPort, seqToBroadcast));
-			}
 		}
 	}
 
@@ -572,6 +598,11 @@ public class ChordState {
 			int known = state.RN.getOrDefault(fromPort, 0);
 			if (seq > known) {
 				state.RN.put(fromPort, seq);
+				// Fairness: record arrival order so exitCS can drain the
+				// queue FIFO instead of relying on HashMap iteration order.
+				// Move to tail on each fresh request to reflect latest order.
+				state.pendingRequesters.remove(Integer.valueOf(fromPort));
+				state.pendingRequesters.addLast(fromPort);
 			}
 			if (state.heldToken != null && !state.inCS && !state.myRequestPending) {
 				int lnFrom = state.heldToken.getLN().getOrDefault(fromPort, 0);
@@ -579,6 +610,9 @@ public class ChordState {
 				if (rnFrom == lnFrom + 1) {
 					tokenToSend = state.heldToken;
 					state.heldToken = null;
+					// We are about to forward to fromPort — drop them from
+					// pendingRequesters so they aren't re-enqueued later.
+					state.pendingRequesters.remove(Integer.valueOf(fromPort));
 				}
 			}
 		}
@@ -623,38 +657,11 @@ public class ChordState {
 			qty = state.myPendingQty;
 		}
 		AppConfig.timestampedStandardPrint("[MUTEX-ACQUIRED]");
-
-		if (ownerPort == myPort) {
-			// Local buy — operate directly on myAds and exit CS synchronously.
-			Ad existing = getMyAd(itemId);
-			if (existing != null && existing.getQty() >= qty) {
-				int newQty = existing.getQty() - qty;
-				Ad updated = new Ad(existing.getItemId(), existing.getName(), newQty,
-						existing.getOwnerId(), existing.getOwnerPort());
-				registerMyAd(updated);
-				// Sync backup with the new quantity.
-				int itemKey = keyHash(itemId);
-				if (isKeyMine(itemKey)) {
-					Ad bkp = getBackupAd(itemId);
-					if (bkp != null) {
-						storeBackupAd(updated);
-					}
-				} else {
-					ServentInfo next = getNextNodeForKey(itemKey);
-					MessageUtil.sendMessage(new BackupQtyUpdateMessage(
-							myPort, next.getListenerPort(), itemId, newQty));
-				}
-				AppConfig.timestampedStandardPrint("[MARKET-BUY-SUCCESS] item_id:" + itemId
-						+ " qty_bought:" + qty + " remaining_qty:" + newQty);
-			} else {
-				AppConfig.timestampedStandardPrint("[MARKET-BUY-FAIL] item_id:" + itemId
-						+ " reason:OUT_OF_STOCK");
-			}
-			exitCS(itemId);
-		} else {
-			// Remote buy — owner will reply via BUY_EXEC_REPLY.
-			MessageUtil.sendMessage(new BuyExecMessage(myPort, ownerPort, itemId, qty, myPort));
-		}
+		// Always send BUY_EXEC over the wire, even when the owner is self —
+		// the message loops back via DelayedMessageSender and BuyExecHandler
+		// runs the atomic decrement.  This guarantees the buy operation is
+		// observable as network traffic (no "all-local" silent execution).
+		MessageUtil.sendMessage(new BuyExecMessage(myPort, ownerPort, itemId, qty, myPort));
 	}
 
 	/**
@@ -696,14 +703,23 @@ public class ChordState {
 				return;
 			}
 			state.heldToken.getLN().put(myPort, state.mySeq);
-			// Add fresh requesters to Q.
-			for (Map.Entry<Integer, Integer> entry : state.RN.entrySet()) {
-				int port = entry.getKey();
-				int rn = entry.getValue();
-				if (port == myPort) continue;
+			// Fairness: iterate pendingRequesters in arrival order (FIFO).
+			// For each requester whose RN > LN (has an outstanding request),
+			// append to the token's Q and remove from pendingRequesters.
+			java.util.Iterator<Integer> it = state.pendingRequesters.iterator();
+			while (it.hasNext()) {
+				int port = it.next();
+				if (port == myPort) {
+					it.remove();
+					continue;
+				}
+				int rn = state.RN.getOrDefault(port, 0);
 				int ln = state.heldToken.getLN().getOrDefault(port, 0);
-				if (rn == ln + 1 && !state.heldToken.getQ().contains(port)) {
-					state.heldToken.getQ().add(port);
+				if (rn == ln + 1) {
+					if (!state.heldToken.getQ().contains(port)) {
+						state.heldToken.getQ().add(port);
+					}
+					it.remove();
 				}
 			}
 			state.inCS = false;
@@ -727,34 +743,28 @@ public class ChordState {
 	 * buyer.  Also fires a BACKUP_QTY_UPDATE so the replica stays in sync.
 	 */
 	public void executeBuyAtOwner(int itemId, int qty, int buyerPort) {
-		Ad existing = getMyAd(itemId);
 		int myPort = AppConfig.myServentInfo.getListenerPort();
-		if (existing == null) {
-			MessageUtil.sendMessage(new BuyExecReplyMessage(myPort, buyerPort, itemId, qty, 0, false));
+
+		// Atomic check-and-decrement — guarantees stock never goes < 0,
+		// even under hypothetical concurrent invocations.
+		Ad updated = tryDecrementMyAd(itemId, qty);
+		if (updated == null) {
+			Ad existing = getMyAd(itemId);
+			int remaining = (existing != null) ? existing.getQty() : 0;
+			MessageUtil.sendMessage(new BuyExecReplyMessage(
+					myPort, buyerPort, itemId, qty, remaining, false));
 			return;
 		}
-		if (existing.getQty() >= qty) {
-			int newQty = existing.getQty() - qty;
-			Ad updated = new Ad(existing.getItemId(), existing.getName(), newQty,
-					existing.getOwnerId(), existing.getOwnerPort());
-			registerMyAd(updated);
-			// Propagate the new qty to the backup copy.
-			int itemKey = keyHash(itemId);
-			if (isKeyMine(itemKey)) {
-				if (getBackupAd(itemId) != null) {
-					storeBackupAd(updated);
-				}
-			} else {
-				ServentInfo next = getNextNodeForKey(itemKey);
-				MessageUtil.sendMessage(new BackupQtyUpdateMessage(
-						myPort, next.getListenerPort(), itemId, newQty));
-			}
-			MessageUtil.sendMessage(new BuyExecReplyMessage(
-					myPort, buyerPort, itemId, qty, newQty, true));
-		} else {
-			MessageUtil.sendMessage(new BuyExecReplyMessage(
-					myPort, buyerPort, itemId, qty, existing.getQty(), false));
-		}
+
+		// Always propagate qty change to backup via Chord routing — handler
+		// at the responsible node will store; no local shortcut.
+		int itemKey = keyHash(itemId);
+		ServentInfo next = getNextNodeForKey(itemKey);
+		MessageUtil.sendMessage(new BackupQtyUpdateMessage(
+				myPort, next.getListenerPort(), itemId, updated.getQty()));
+
+		MessageUtil.sendMessage(new BuyExecReplyMessage(
+				myPort, buyerPort, itemId, qty, updated.getQty(), true));
 	}
 
 	/**

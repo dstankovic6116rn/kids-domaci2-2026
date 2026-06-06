@@ -1,6 +1,7 @@
 package app;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 /**
@@ -28,6 +29,12 @@ public class ItemMutexState {
 
 	// Highest request seq seen from each node, keyed by their port.
 	public final Map<Integer, Integer> RN = new HashMap<>();
+
+	// Fairness: arrival-ordered list of requesters whose latest REQUEST has
+	// not yet been forwarded the token.  Used by exitCS to populate the
+	// token's Q in FIFO order (vs. RN.entrySet() which is HashMap-ordered).
+	// Entries leave this list when we forward the token to that requester.
+	public final LinkedList<Integer> pendingRequesters = new LinkedList<>();
 
 	// My own request seq counter (only meaningful on the requesting node).
 	public int mySeq = 0;

@@ -1,12 +1,35 @@
-18:54:37 - Starting servent [0|localhost|1600]
-18:54:37 - Pausing for 60000 ms
-18:54:39 - Sending message [0|1600|0||NEW_NODE|1400|24]
-18:54:42 - Got message [4|1300|3||WELCOME|1600|0]
-18:54:43 - Sending message [0|1600|1||UPDATE|1300|4]
-18:54:48 - Got message [0|1600|6|1300,1400,1100,1200|UPDATE|1600|0]
-18:54:48 - [SYS-NEIGHBORS] my_id:0 neighbors:48,4;
-18:55:06 - Got message [48|1200|10||LIST_ITEM_INDEX|1600|0]
-18:55:07 - Got message [48|1200|9||LIST_ITEM_BACKUP|1600|0]
-18:55:07 - Sending message [0|1600|2||LIST_ITEM_INDEX|1400|24]
-18:55:08 - Sending message [0|1600|3||LIST_ITEM_BACKUP|1300|4]
-18:55:37 - Stopping...
+18:14:35 - Starting servent [0|localhost|1600]
+
+18:14:36 - Pausing for 45000 ms
+18:14:37 - Sending message [0|1600|0||NEW_NODE|1300|4]
+18:14:37 - Got message [4|1300|4||WELCOME|1600|0]
+18:14:39 - Sending message [0|1600|1||UPDATE|1300|4]
+18:14:43 - Got message [0|1600|6|1300,1400,1100,1200|UPDATE|1600|0]
+
+18:14:43 - [SYS-NEIGHBORS] my_id:0 neighbors:48,4;
+
+18:15:07 - Got message [48|1200|8||LIST_ITEM_INDEX|1600|0]
+18:15:07 - Got message [48|1200|7||LIST_ITEM_BACKUP|1600|0]
+18:15:08 - Sending message [0|1600|2||LIST_ITEM_INDEX|1400|24]
+18:15:08 - Sending message [0|1600|3||LIST_ITEM_BACKUP|1300|4]
+
+18:15:21 - Pausing for 105000 ms
+
+18:15:22 - Sending message [0|1600|4||SEARCH_LOOKUP|1400|24]
+18:15:24 - Got message [28|1100|9||SEARCH_LOOKUP_REPLY|1600|0]
+
+18:15:25 - Sending message [0|1600|6||AD_FETCH|1200|48]
+18:15:25 - Sending message [0|1600|5||AD_FETCH|1100|28]
+18:15:26 - Got message [48|1200|9||AD_FETCH_REPLY|1600|0]
+18:15:26 - [MARKET-SEARCH-RESULT] item_id:200 name:"apple" qty:3 owner_id:48
+
+18:15:26 - Got message [28|1100|10||AD_FETCH_REPLY|1600|0]
+18:15:26 - [MARKET-SEARCH-RESULT] item_id:100 name:"apple" qty:5 owner_id:28
+
+18:15:55 - Got message [24|1400|10||MUTEX_REQUEST|1600|0]
+18:15:56 - Got message [4|1300|12||MUTEX_REQUEST|1600|0]
+
+18:16:47 - Got message [48|1200|12||SEARCH_LOOKUP|1600|0]
+18:16:48 - Sending message [0|1600|7||SEARCH_LOOKUP|1400|24]
+
+18:17:06 - Stopping...

@@ -1,14 +1,8 @@
 package cli.command;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import app.Ad;
 import app.AppConfig;
 import app.ChordState;
-import app.NameIndexEntry;
 import app.ServentInfo;
-import servent.message.AdFetchMessage;
 import servent.message.SearchLookupMessage;
 import servent.message.util.MessageUtil;
 
@@ -56,36 +50,11 @@ public class SearchCommand implements CLICommand {
 		int nameKey = ChordState.keyHash(name.hashCode());
 		int myPort = AppConfig.myServentInfo.getListenerPort();
 
-		if (AppConfig.chordState.isKeyMine(nameKey)) {
-			// The name index for this key lives on this node.
-			List<NameIndexEntry> all = AppConfig.chordState.getNameIndex(nameKey);
-			List<NameIndexEntry> matches = new ArrayList<>();
-			for (NameIndexEntry e : all) {
-				// Filter by exact name to exclude hash-collision entries.
-				if (e.getName().equals(name)) {
-					matches.add(e);
-				}
-			}
-			for (NameIndexEntry entry : matches) {
-				if (entry.getOwnerPort() == myPort) {
-					// We own this ad — print directly without a network round-trip.
-					Ad ad = AppConfig.chordState.getMyAd(entry.getItemId());
-					if (ad != null) {
-						AppConfig.timestampedStandardPrint("[MARKET-SEARCH-RESULT] item_id:"
-								+ ad.getItemId() + " name:\"" + ad.getName() + "\" qty:"
-								+ ad.getQty() + " owner_id:" + ad.getOwnerId());
-					}
-				} else {
-					// Remote owner — ask for the live ad; result printed by AdFetchReplyHandler.
-					MessageUtil.sendMessage(new AdFetchMessage(myPort, entry.getOwnerPort(),
-							entry.getItemId(), myPort));
-				}
-			}
-		} else {
-			// Name index is on another node — route the lookup via Chord.
-			ServentInfo next = AppConfig.chordState.getNextNodeForKey(nameKey);
-			MessageUtil.sendMessage(new SearchLookupMessage(myPort, next.getListenerPort(),
-					name, nameKey, myPort));
-		}
+		// Always route SEARCH_LOOKUP through the network — even when this
+		// node owns the name-index key, the message loops back via TCP and
+		// SearchLookupHandler handles it.  No local shortcut.
+		ServentInfo next = AppConfig.chordState.getNextNodeForKey(nameKey);
+		MessageUtil.sendMessage(new SearchLookupMessage(myPort, next.getListenerPort(),
+				name, nameKey, myPort));
 	}
 }

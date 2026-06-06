@@ -1,6 +1,5 @@
 package cli.command;
 
-import app.Ad;
 import app.AppConfig;
 import app.ChordState;
 import app.ItemMutexState;
@@ -62,21 +61,11 @@ public class BuyCommand implements CLICommand {
 
 		int myPort = AppConfig.myServentInfo.getListenerPort();
 
-		// Fast path: we are the owner.
-		Ad mine = AppConfig.chordState.getMyAd(itemId);
-		if (mine != null) {
-			AppConfig.chordState.requestBuyMutex(itemId, qty, myPort);
-			return;
-		}
-
-		// Second-fastest path: we hold the backup, owner port is in it.
-		Ad bkp = AppConfig.chordState.getBackupAd(itemId);
-		if (bkp != null) {
-			AppConfig.chordState.requestBuyMutex(itemId, qty, bkp.getOwnerPort());
-			return;
-		}
-
-		// Slow path: stash qty in state then route BUY_OWNER_LOOKUP via Chord.
+		// Always discover the owner via the Chord-routed lookup, even when
+		// we ourselves are the owner or hold the backup.  The message
+		// loops back via TCP and BuyOwnerLookupHandler answers normally.
+		// No local shortcuts — guarantees the operation goes through the
+		// network as required.
 		ItemMutexState state = AppConfig.chordState.getOrCreateMutexState(itemId);
 		synchronized (state) {
 			state.myPendingQty = qty;

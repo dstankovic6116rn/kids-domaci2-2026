@@ -92,24 +92,18 @@ public class ListItemCommand implements CLICommand {
 		// Runs before [MARKET-LIST] print; sends are non-blocking (each spawns a thread).
 		AppConfig.chordState.notifySubscribers(ad);
 
-		// Step 3: route backup to the node responsible for hash(itemId).
+		// Step 3: always route backup through the network (even when the
+		// responsible node is self — the message loops back through TCP
+		// and ListItemBackupHandler will store it).  No local shortcut.
 		int itemKey = ChordState.keyHash(itemId);
-		if (AppConfig.chordState.isKeyMine(itemKey)) {
-			AppConfig.chordState.storeBackupAd(ad);
-		} else {
-			ServentInfo next = AppConfig.chordState.getNextNodeForKey(itemKey);
-			MessageUtil.sendMessage(new ListItemBackupMessage(myPort, next.getListenerPort(), ad));
-		}
+		ServentInfo backupNext = AppConfig.chordState.getNextNodeForKey(itemKey);
+		MessageUtil.sendMessage(new ListItemBackupMessage(myPort, backupNext.getListenerPort(), ad));
 
-		// Step 4: route name-index entry to the node responsible for hash(name).
+		// Step 4: always route name-index entry through the network.
 		int nameKey = ChordState.keyHash(name.hashCode());
 		NameIndexEntry entry = new NameIndexEntry(itemId, myId, myPort, name);
-		if (AppConfig.chordState.isKeyMine(nameKey)) {
-			AppConfig.chordState.appendNameIndex(nameKey, entry);
-		} else {
-			ServentInfo next = AppConfig.chordState.getNextNodeForKey(nameKey);
-			MessageUtil.sendMessage(new ListItemIndexMessage(myPort, next.getListenerPort(), entry, nameKey));
-		}
+		ServentInfo indexNext = AppConfig.chordState.getNextNodeForKey(nameKey);
+		MessageUtil.sendMessage(new ListItemIndexMessage(myPort, indexNext.getListenerPort(), entry, nameKey));
 
 		// Step 5: confirm the listing to the user.
 		AppConfig.timestampedStandardPrint("[MARKET-LIST] item_id:" + itemId

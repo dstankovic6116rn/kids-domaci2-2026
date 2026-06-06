@@ -1,4 +1,6 @@
 pause 60000
-buy 100 3
-pause 45000
+list_item 200 apple 3
+pause 100000
+search apple
+pause 20000
 stop

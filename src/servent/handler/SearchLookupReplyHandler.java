@@ -1,6 +1,5 @@
 package servent.handler;
 
-import app.Ad;
 import app.AppConfig;
 import app.NameIndexEntry;
 import servent.message.AdFetchMessage;
@@ -44,20 +43,12 @@ public class SearchLookupReplyHandler implements MessageHandler {
 		int myPort = AppConfig.myServentInfo.getListenerPort();
 
 		for (NameIndexEntry entry : msg.getEntries()) {
-			if (entry.getOwnerPort() == myPort) {
-				// Owner is us — no network hop needed, print directly.
-				Ad ad = AppConfig.chordState.getMyAd(entry.getItemId());
-				if (ad != null) {
-					AppConfig.timestampedStandardPrint("[MARKET-SEARCH-RESULT] item_id:"
-							+ ad.getItemId() + " name:\"" + ad.getName() + "\" qty:"
-							+ ad.getQty() + " owner_id:" + ad.getOwnerId());
-				}
-			} else {
-				// Owner is a remote node — ask it for the live ad.
-				AdFetchMessage fetch = new AdFetchMessage(myPort, entry.getOwnerPort(),
-						entry.getItemId(), myPort);
-				MessageUtil.sendMessage(fetch);
-			}
+			// Always ask the owner via AD_FETCH — even when the owner is
+			// self, the message loops back through TCP and AdFetchHandler
+			// will reply normally.  No local print shortcut.
+			AdFetchMessage fetch = new AdFetchMessage(myPort, entry.getOwnerPort(),
+					entry.getItemId(), myPort);
+			MessageUtil.sendMessage(fetch);
 		}
 	}
 }

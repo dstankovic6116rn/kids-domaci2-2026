@@ -1,4 +1,6 @@
-pause 65000
-buy 100 1
-pause 20000
+pause 48000
+subscribe localhost:1200
+pause 37000
+buy 100 3
+pause 75000
 stop

@@ -1,4 +1,6 @@
 pause 60000
 list_item 100 apple 5
-pause 55000
+pause 40000
+list_item 300 banana 4
+pause 90000
 stop

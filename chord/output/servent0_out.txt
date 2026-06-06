@@ -1,40 +1,77 @@
-18:53:57 - Starting servent [28|localhost|1100]
-18:53:57 - Pausing for 60000 ms
-18:53:57 - First node in Chord system.
-18:54:09 - Got message [48|1200|0||NEW_NODE|1100|28]
-18:54:09 - Sending message [28|1100|0||WELCOME|1200|48]
-18:54:11 - Got message [48|1200|1||UPDATE|1100|28]
-18:54:11 - [SYS-NEIGHBORS] my_id:28 neighbors:48,48;
-18:54:12 - Sending message [48|1200|1|1100|UPDATE|1200|48]
-18:54:19 - Got message [4|1300|2||NEW_NODE|1100|28]
-18:54:20 - Sending message [28|1100|2||WELCOME|1300|4]
-18:54:21 - Got message [4|1300|1||UPDATE|1100|28]
-18:54:23 - Sending message [4|1300|3|1100|UPDATE|1200|48]
-18:54:28 - Got message [24|1400|0||NEW_NODE|1100|28]
-18:54:29 - Sending message [28|1100|4||WELCOME|1400|24]
-18:54:30 - Got message [24|1400|1||UPDATE|1100|28]
-18:54:31 - Sending message [24|1400|5|1100|UPDATE|1200|48]
-18:54:40 - Got message [0|1600|2||NEW_NODE|1100|28]
-18:54:40 - Sending message [0|1600|6||NEW_NODE|1200|48]
-18:54:45 - Got message [0|1600|3|1300,1400|UPDATE|1100|28]
-18:54:47 - Sending message [0|1600|7|1300,1400,1100|UPDATE|1200|48]
-18:54:57 - Sent subscribe request to node 48 (port 1200).
-18:54:57 - Pausing for 5000 ms
-18:54:58 - Got message [48|1200|7||SUBSCRIBE_REQUEST|1100|28]
-18:54:58 - Node 48 (port 1200) subscribed to us.
-18:54:59 - Sending message [28|1100|8||SUBSCRIBE_REQUEST|1200|48]
-18:55:02 - [MARKET-LIST] item_id:100 name:"apple" qty:5
-18:55:02 - Pausing for 20000 ms
-18:55:03 - Sending message [28|1100|10||LIST_ITEM_BACKUP|1200|48]
-18:55:03 - Sending message [28|1100|9||MARKET_NOTIFICATION|1200|48]
-18:55:06 - Got message [48|1200|8||MARKET_NOTIFICATION|1100|28]
-18:55:06 - [MARKET-NOTIFICATION] node:48 posted item_id:200
-18:55:08 - Got message [4|1300|5||SUBSCRIBE_REQUEST|1100|28]
-18:55:08 - Node 4 (port 1300) subscribed to us.
-18:55:08 - Got message [24|1400|4||LIST_ITEM_INDEX|1100|28]
-18:55:22 - [MARKET-SEARCH-RESULT] item_id:100 name:"apple" qty:5 owner_id:28
-18:55:22 - Pausing for 15000 ms
-18:55:24 - Sending message [28|1100|11||AD_FETCH|1200|48]
-18:55:25 - Got message [48|1200|11||AD_FETCH_REPLY|1100|28]
-18:55:25 - [MARKET-SEARCH-RESULT] item_id:200 name:"apple" qty:3 owner_id:48
-18:55:37 - Stopping...
+18:13:56 - Starting servent [28|localhost|1100]
+18:13:56 - Pausing for 60000 ms
+
+18:13:56 - First node in Chord system.
+
+18:14:06 - Got message [48|1200|0||NEW_NODE|1100|28]
+18:14:08 - Sending message [28|1100|0||WELCOME|1200|48]
+18:14:08 - Got message [48|1200|1||UPDATE|1100|28]
+
+18:14:08 - [SYS-NEIGHBORS] my_id:28 neighbors:48,48;
+
+18:14:10 - Sending message [48|1200|1|1100|UPDATE|1200|48]
+18:14:17 - Got message [4|1300|2||NEW_NODE|1100|28]
+18:14:18 - Sending message [28|1100|2||WELCOME|1300|4]
+18:14:19 - Got message [4|1300|1||UPDATE|1100|28]
+18:14:20 - Sending message [4|1300|3|1100|UPDATE|1200|48]
+18:14:28 - Got message [24|1400|2||NEW_NODE|1100|28]
+18:14:28 - Sending message [28|1100|4||WELCOME|1400|24]
+18:14:30 - Got message [24|1400|1||UPDATE|1100|28]
+18:14:31 - Sending message [24|1400|5|1100|UPDATE|1200|48]
+18:14:40 - Got message [0|1600|2|1300,1400|UPDATE|1100|28]
+18:14:42 - Sending message [0|1600|6|1300,1400,1100|UPDATE|1200|48]
+
+18:14:56 - [MARKET-LIST] item_id:100 name:"apple" qty:5
+
+18:14:56 - Pausing for 40000 ms
+
+18:14:56 - Sending message [28|1100|7||LIST_ITEM_BACKUP|1200|48]
+
+18:14:57 - Sending message [28|1100|8||LIST_ITEM_INDEX|1100|28]
+18:14:57 - Got message [28|1100|8||LIST_ITEM_INDEX|1100|28]
+
+18:15:09 - Got message [24|1400|3||LIST_ITEM_INDEX|1100|28]
+
+18:15:11 - Got message [4|1300|7||SUBSCRIBE_REQUEST|1100|28]
+18:15:11 - Node 4 (port 1300) subscribed to us.
+
+18:15:23 - Got message [24|1400|5||SEARCH_LOOKUP|1100|28]
+18:15:24 - Sending message [28|1100|9||SEARCH_LOOKUP_REPLY|1600|0]
+
+18:15:25 - Got message [0|1600|5||AD_FETCH|1100|28]
+18:15:26 - Sending message [28|1100|10||AD_FETCH_REPLY|1600|0]
+
+18:15:36 - [MARKET-LIST] item_id:300 name:"banana" qty:4
+
+18:15:36 - Pausing for 90000 ms
+18:15:37 - Sending message [28|1100|12||LIST_ITEM_BACKUP|1200|48]
+18:15:37 - Sending message [28|1100|11||MARKET_NOTIFICATION|1300|4]
+
+18:15:37 - Sending message [28|1100|13||LIST_ITEM_INDEX|1200|48]
+
+18:15:52 - Got message [24|1400|6||BUY_OWNER_LOOKUP|1100|28]
+18:15:52 - Sending message [28|1100|14||BUY_OWNER_LOOKUP|1200|48]
+
+18:15:53 - Got message [24|1400|7||BUY_OWNER_LOOKUP|1100|28]
+18:15:54 - Sending message [28|1100|15||BUY_OWNER_LOOKUP|1200|48]
+
+18:15:55 - Got message [24|1400|8||MUTEX_REQUEST|1100|28]
+18:15:56 - Sending message [28|1100|16||MUTEX_TOKEN|1400|24]
+
+18:15:56 - Got message [4|1300|10||MUTEX_REQUEST|1100|28]
+
+18:15:57 - Got message [24|1400|12||BUY_EXEC|1100|28]
+18:15:58 - Sending message [28|1100|18||BUY_EXEC_REPLY|1400|24]
+
+18:15:58 - Sending message [28|1100|17||BACKUP_QTY_UPDATE|1200|48]
+
+18:16:00 - Got message [4|1300|13||BUY_EXEC|1100|28]
+18:16:01 - Sending message [28|1100|19||BUY_EXEC_REPLY|1300|4]
+
+18:16:49 - Got message [24|1400|14||SEARCH_LOOKUP|1100|28]
+18:16:49 - Sending message [28|1100|20||SEARCH_LOOKUP_REPLY|1200|48]
+
+18:16:51 - Got message [48|1200|13||AD_FETCH|1100|28]
+18:16:52 - Sending message [28|1100|21||AD_FETCH_REPLY|1200|48]
+
+18:17:06 - Stopping...

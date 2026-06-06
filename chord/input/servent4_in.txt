@@ -1,2 +1,6 @@
-pause 75000
+pause 45000
+subscribe localhost:1100
+pause 37000
+search apple
+pause 105000
 stop

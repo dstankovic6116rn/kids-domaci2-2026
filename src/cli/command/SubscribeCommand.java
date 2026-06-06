@@ -13,9 +13,10 @@ import servent.message.util.MessageUtil;
  * will receive a MARKET_NOTIFICATION and print [MARKET-NOTIFICATION].
  *
  * What happens:
- *   1. Parse "host:port" from args.
- *   2. Send a SUBSCRIBE_REQUEST directly to that node.
- *   3. The remote node (SubscribeRequestHandler) stores us in its subscribers set.
+ * 1. Parse "host:port" from args.
+ * 2. Send a SUBSCRIBE_REQUEST directly to that node.
+ * 3. The remote node (SubscribeRequestHandler) stores us in its subscribers
+ * set.
  *
  * Example: subscribe localhost:1200
  * (Subscribe this node to the node listening on port 1200.)

@@ -1,15 +1,51 @@
-18:54:27 - Starting servent [24|localhost|1400]
-18:54:27 - Pausing for 70000 ms
-18:54:28 - Sending message [24|1400|0||NEW_NODE|1100|28]
-18:54:29 - Got message [28|1100|4||WELCOME|1400|24]
-18:54:30 - Sending message [24|1400|1||UPDATE|1100|28]
-18:54:33 - Got message [24|1400|2|1100,1200,1300|UPDATE|1400|24]
-18:54:33 - [SYS-NEIGHBORS] my_id:24 neighbors:4,28;
-18:54:39 - Got message [0|1600|0||NEW_NODE|1400|24]
-18:54:40 - Sending message [0|1600|2||NEW_NODE|1100|28]
-18:54:44 - Got message [0|1600|4|1300|UPDATE|1400|24]
-18:54:45 - Sending message [0|1600|3|1300,1400|UPDATE|1100|28]
-18:55:07 - Got message [0|1600|2||LIST_ITEM_INDEX|1400|24]
-18:55:08 - Sending message [24|1400|4||LIST_ITEM_INDEX|1100|28]
-18:55:09 - Got message [4|1300|6||LIST_ITEM_BACKUP|1400|24]
-18:55:37 - Stopping...
+18:14:26 - Starting servent [24|localhost|1400]
+
+18:14:26 - Pausing for 48000 ms
+18:14:26 - Sending message [24|1400|0||NEW_NODE|1200|48]
+18:14:28 - Got message [28|1100|4||WELCOME|1400|24]
+18:14:30 - Sending message [24|1400|1||UPDATE|1100|28]
+18:14:33 - Got message [24|1400|3|1100,1200,1300|UPDATE|1400|24]
+
+18:14:33 - [SYS-NEIGHBORS] my_id:24 neighbors:4,28;
+
+18:14:39 - Got message [0|1600|5|1300|UPDATE|1400|24]
+18:14:40 - Sending message [0|1600|2|1300,1400|UPDATE|1100|28]
+
+18:15:08 - Got message [0|1600|2||LIST_ITEM_INDEX|1400|24]
+18:15:09 - Sending message [24|1400|3||LIST_ITEM_INDEX|1100|28]
+
+18:15:09 - Got message [4|1300|6||LIST_ITEM_BACKUP|1400|24]
+
+18:15:14 - Sent subscribe request to node 48 (port 1200).
+18:15:14 - Pausing for 37000 ms
+18:15:15 - Sending message [24|1400|4||SUBSCRIBE_REQUEST|1200|48]
+18:15:22 - Got message [0|1600|4||SEARCH_LOOKUP|1400|24]
+18:15:23 - Sending message [24|1400|5||SEARCH_LOOKUP|1100|28]
+18:15:51 - Pausing for 75000 ms
+
+
+18:15:51 - Got message [4|1300|8||BUY_OWNER_LOOKUP|1400|24]
+18:15:52 - Sending message [24|1400|6||BUY_OWNER_LOOKUP|1100|28]
+18:15:53 - Sending message [24|1400|7||BUY_OWNER_LOOKUP|1100|28]
+18:15:54 - Got message [48|1200|10||BUY_OWNER_REPLY|1400|24]
+
+18:15:54 - [MUTEX-REQUEST] item_id:100
+18:15:55 - Sending message [24|1400|11||MUTEX_REQUEST|1300|4]
+18:15:55 - Sending message [24|1400|10||MUTEX_REQUEST|1600|0]
+18:15:55 - Sending message [24|1400|9||MUTEX_REQUEST|1200|48]
+18:15:55 - Sending message [24|1400|8||MUTEX_REQUEST|1100|28]
+
+18:15:55 - Got message [4|1300|9||MUTEX_REQUEST|1400|24]
+18:15:56 - Got message [28|1100|16||MUTEX_TOKEN|1400|24]
+
+18:15:56 - [MUTEX-ACQUIRED]
+18:15:57 - Sending message [24|1400|12||BUY_EXEC|1100|28]
+18:15:58 - Got message [28|1100|18||BUY_EXEC_REPLY|1400|24]
+18:15:58 - [MARKET-BUY-SUCCESS] item_id:100 qty_bought:3 remaining_qty:2
+18:15:58 - [MUTEX-RELEASED]
+
+18:15:59 - Sending message [24|1400|13||MUTEX_TOKEN|1300|4]
+
+18:16:48 - Got message [0|1600|7||SEARCH_LOOKUP|1400|24]
+18:16:49 - Sending message [24|1400|14||SEARCH_LOOKUP|1100|28]
+18:17:06 - Stopping...
