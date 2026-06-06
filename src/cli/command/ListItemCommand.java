@@ -6,7 +6,7 @@ import app.ChordState;
 import app.NameIndexEntry;
 import app.ServentInfo;
 import servent.message.ListItemBackupMessage;
-import servent.message.ListItemIndexMessage;
+import servent.message.NameIndexStoreMessage;
 import servent.message.util.MessageUtil;
 
 /**
@@ -103,7 +103,7 @@ public class ListItemCommand implements CLICommand {
 		int nameKey = ChordState.keyHash(name.hashCode());
 		NameIndexEntry entry = new NameIndexEntry(itemId, myId, myPort, name);
 		ServentInfo indexNext = AppConfig.chordState.getNextNodeForKey(nameKey);
-		MessageUtil.sendMessage(new ListItemIndexMessage(myPort, indexNext.getListenerPort(), entry, nameKey));
+		MessageUtil.sendMessage(new NameIndexStoreMessage(myPort, indexNext.getListenerPort(), entry, nameKey));
 
 		// Step 5: confirm the listing to the user.
 		AppConfig.timestampedStandardPrint("[MARKET-LIST] item_id:" + itemId

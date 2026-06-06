@@ -18,7 +18,7 @@ import servent.handler.BuyExecReplyHandler;
 import servent.handler.BuyOwnerLookupHandler;
 import servent.handler.BuyOwnerReplyHandler;
 import servent.handler.ListItemBackupHandler;
-import servent.handler.ListItemIndexHandler;
+import servent.handler.NameIndexStoreHandler;
 import servent.handler.MarketNotificationHandler;
 import servent.handler.MessageHandler;
 import servent.handler.MutexRequestHandler;
@@ -105,8 +105,8 @@ public class SimpleServentListener implements Runnable, Cancellable {
 				case LIST_ITEM_BACKUP:
 					messageHandler = new ListItemBackupHandler(clientMessage);
 					break;
-				case LIST_ITEM_INDEX:
-					messageHandler = new ListItemIndexHandler(clientMessage);
+				case NAME_INDEX_STORE:
+					messageHandler = new NameIndexStoreHandler(clientMessage);
 					break;
 				case SEARCH_LOOKUP:
 					messageHandler = new SearchLookupHandler(clientMessage);

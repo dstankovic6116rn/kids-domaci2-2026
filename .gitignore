@@ -19,8 +19,6 @@ bin/
 .vscode/
 
 # Logs / runtime output
-chord/output/
-chord/error/
 *.log
 
 # OS files

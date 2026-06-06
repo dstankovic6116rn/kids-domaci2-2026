@@ -1,51 +1,36 @@
-18:14:26 - Starting servent [24|localhost|1400]
-
-18:14:26 - Pausing for 48000 ms
-18:14:26 - Sending message [24|1400|0||NEW_NODE|1200|48]
-18:14:28 - Got message [28|1100|4||WELCOME|1400|24]
-18:14:30 - Sending message [24|1400|1||UPDATE|1100|28]
-18:14:33 - Got message [24|1400|3|1100,1200,1300|UPDATE|1400|24]
-
-18:14:33 - [SYS-NEIGHBORS] my_id:24 neighbors:4,28;
-
-18:14:39 - Got message [0|1600|5|1300|UPDATE|1400|24]
-18:14:40 - Sending message [0|1600|2|1300,1400|UPDATE|1100|28]
-
-18:15:08 - Got message [0|1600|2||LIST_ITEM_INDEX|1400|24]
-18:15:09 - Sending message [24|1400|3||LIST_ITEM_INDEX|1100|28]
-
-18:15:09 - Got message [4|1300|6||LIST_ITEM_BACKUP|1400|24]
-
-18:15:14 - Sent subscribe request to node 48 (port 1200).
-18:15:14 - Pausing for 37000 ms
-18:15:15 - Sending message [24|1400|4||SUBSCRIBE_REQUEST|1200|48]
-18:15:22 - Got message [0|1600|4||SEARCH_LOOKUP|1400|24]
-18:15:23 - Sending message [24|1400|5||SEARCH_LOOKUP|1100|28]
-18:15:51 - Pausing for 75000 ms
-
-
-18:15:51 - Got message [4|1300|8||BUY_OWNER_LOOKUP|1400|24]
-18:15:52 - Sending message [24|1400|6||BUY_OWNER_LOOKUP|1100|28]
-18:15:53 - Sending message [24|1400|7||BUY_OWNER_LOOKUP|1100|28]
-18:15:54 - Got message [48|1200|10||BUY_OWNER_REPLY|1400|24]
-
-18:15:54 - [MUTEX-REQUEST] item_id:100
-18:15:55 - Sending message [24|1400|11||MUTEX_REQUEST|1300|4]
-18:15:55 - Sending message [24|1400|10||MUTEX_REQUEST|1600|0]
-18:15:55 - Sending message [24|1400|9||MUTEX_REQUEST|1200|48]
-18:15:55 - Sending message [24|1400|8||MUTEX_REQUEST|1100|28]
-
-18:15:55 - Got message [4|1300|9||MUTEX_REQUEST|1400|24]
-18:15:56 - Got message [28|1100|16||MUTEX_TOKEN|1400|24]
-
-18:15:56 - [MUTEX-ACQUIRED]
-18:15:57 - Sending message [24|1400|12||BUY_EXEC|1100|28]
-18:15:58 - Got message [28|1100|18||BUY_EXEC_REPLY|1400|24]
-18:15:58 - [MARKET-BUY-SUCCESS] item_id:100 qty_bought:3 remaining_qty:2
-18:15:58 - [MUTEX-RELEASED]
-
-18:15:59 - Sending message [24|1400|13||MUTEX_TOKEN|1300|4]
-
-18:16:48 - Got message [0|1600|7||SEARCH_LOOKUP|1400|24]
-18:16:49 - Sending message [24|1400|14||SEARCH_LOOKUP|1100|28]
-18:17:06 - Stopping...
+22:22:30 - Starting servent [24|localhost|1400]
+22:22:30 - Pausing for 48000 ms
+22:22:31 - Sending message [24|1400|0||NEW_NODE|1100|28]
+22:22:32 - Got message [28|1100|4||WELCOME|1400|24]
+22:22:33 - Sending message [24|1400|1||UPDATE|1100|28]
+22:22:35 - Got message [24|1400|2|1100,1200,1300|UPDATE|1400|24]
+22:22:36 - [SYS-NEIGHBORS] my_id:24 neighbors:4,28;
+22:22:47 - Got message [0|1600|4|1300|UPDATE|1400|24]
+22:22:48 - Sending message [0|1600|2|1300,1400|UPDATE|1100|28]
+22:23:12 - Got message [0|1600|3||LIST_ITEM_INDEX|1400|24]
+22:23:13 - Got message [4|1300|5||LIST_ITEM_BACKUP|1400|24]
+22:23:13 - Sending message [24|1400|3||LIST_ITEM_INDEX|1100|28]
+22:23:18 - Sent subscribe request to node 48 (port 1200).
+22:23:18 - Pausing for 37000 ms
+22:23:20 - Sending message [24|1400|4||SUBSCRIBE_REQUEST|1200|48]
+22:23:55 - Pausing for 75000 ms
+22:23:56 - Got message [4|1300|7||BUY_OWNER_LOOKUP|1400|24]
+22:23:57 - Sending message [24|1400|5||BUY_OWNER_LOOKUP|1100|28]
+22:23:57 - Sending message [24|1400|6||BUY_OWNER_LOOKUP|1100|28]
+22:23:58 - Got message [48|1200|9||BUY_OWNER_REPLY|1400|24]
+22:23:58 - [MUTEX-REQUEST] item_id:100
+22:23:59 - Sending message [24|1400|10||MUTEX_REQUEST|1300|4]
+22:23:59 - Sending message [24|1400|7||MUTEX_REQUEST|1100|28]
+22:23:59 - Sending message [24|1400|8||MUTEX_REQUEST|1200|48]
+22:24:00 - Sending message [24|1400|9||MUTEX_REQUEST|1600|0]
+22:24:00 - Got message [4|1300|8||MUTEX_REQUEST|1400|24]
+22:24:00 - Got message [28|1100|15||MUTEX_TOKEN|1400|24]
+22:24:00 - [MUTEX-ACQUIRED]
+22:24:01 - Sending message [24|1400|11||BUY_EXEC|1100|28]
+22:24:02 - Got message [28|1100|17||BUY_EXEC_REPLY|1400|24]
+22:24:02 - [MARKET-BUY-SUCCESS] item_id:100 qty_bought:3 remaining_qty:2
+22:24:02 - [MUTEX-RELEASED]
+22:24:03 - Got message [0|1600|5||SEARCH_LOOKUP|1400|24]
+22:24:03 - Sending message [24|1400|12||MUTEX_TOKEN|1300|4]
+22:24:04 - Sending message [24|1400|13||SEARCH_LOOKUP|1100|28]
+22:25:10 - Stopping...

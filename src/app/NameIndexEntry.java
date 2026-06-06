@@ -20,7 +20,7 @@ import java.io.Serializable;
  * in a 64-slot ring.  Filtering by exact name during search prevents returning
  * unrelated products that happen to share the same hash slot.
  *
- * Serializable because instances travel inside ListItemIndexMessage and
+ * Serializable because instances travel inside NameIndexStoreMessage and
  * SearchLookupReplyMessage over the network.
  */
 public class NameIndexEntry implements Serializable {

@@ -2,13 +2,13 @@ package servent.handler;
 
 import app.AppConfig;
 import app.ServentInfo;
-import servent.message.ListItemIndexMessage;
 import servent.message.Message;
 import servent.message.MessageType;
+import servent.message.NameIndexStoreMessage;
 import servent.message.util.MessageUtil;
 
 /**
- * Handles a LIST_ITEM_INDEX message.
+ * Handles a NAME_INDEX_STORE message.
  *
  * Goal: append a NameIndexEntry to the name index on the node whose Chord key
  * range contains hash(productName).  This makes the product findable by
@@ -21,21 +21,21 @@ import servent.message.util.MessageUtil;
  * Same Chord forwarding pattern as ListItemBackupHandler, just for a different
  * key (hash of the product name instead of hash of the itemId).
  */
-public class ListItemIndexHandler implements MessageHandler {
+public class NameIndexStoreHandler implements MessageHandler {
 
 	private final Message clientMessage;
 
-	public ListItemIndexHandler(Message clientMessage) {
+	public NameIndexStoreHandler(Message clientMessage) {
 		this.clientMessage = clientMessage;
 	}
 
 	@Override
 	public void run() {
-		if (clientMessage.getMessageType() != MessageType.LIST_ITEM_INDEX) {
-			AppConfig.timestampedErrorPrint("ListItemIndexHandler got wrong type");
+		if (clientMessage.getMessageType() != MessageType.NAME_INDEX_STORE) {
+			AppConfig.timestampedErrorPrint("NameIndexStoreHandler got wrong type");
 			return;
 		}
-		ListItemIndexMessage msg = (ListItemIndexMessage) clientMessage;
+		NameIndexStoreMessage msg = (NameIndexStoreMessage) clientMessage;
 		int nameKey = msg.getNameKey();
 
 		if (AppConfig.chordState.isKeyMine(nameKey)) {
@@ -44,7 +44,7 @@ public class ListItemIndexHandler implements MessageHandler {
 		} else {
 			// Not our key — forward one hop closer.
 			ServentInfo next = AppConfig.chordState.getNextNodeForKey(nameKey);
-			ListItemIndexMessage fwd = new ListItemIndexMessage(
+			NameIndexStoreMessage fwd = new NameIndexStoreMessage(
 					AppConfig.myServentInfo.getListenerPort(), next.getListenerPort(),
 					msg.getEntry(), nameKey);
 			MessageUtil.sendMessage(fwd);

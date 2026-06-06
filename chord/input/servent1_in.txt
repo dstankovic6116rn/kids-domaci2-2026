@@ -1,6 +1,6 @@
 pause 60000
 list_item 200 apple 3
 pause 100000
-search apple
+search banana
 pause 20000
 stop
