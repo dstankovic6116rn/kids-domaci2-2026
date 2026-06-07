@@ -1,56 +1,55 @@
-22:22:00 - Starting servent [28|localhost|1100]
-22:22:00 - Pausing for 60000 ms
-22:22:00 - First node in Chord system.
-22:22:12 - Got message [48|1200|0||NEW_NODE|1100|28]
-22:22:13 - Sending message [28|1100|0||WELCOME|1200|48]
-22:22:13 - Got message [48|1200|1||UPDATE|1100|28]
-22:22:13 - [SYS-NEIGHBORS] my_id:28 neighbors:48,48;
-22:22:14 - Sending message [48|1200|1|1100|UPDATE|1200|48]
-22:22:21 - Got message [4|1300|2||NEW_NODE|1100|28]
-22:22:23 - Sending message [28|1100|2||WELCOME|1300|4]
-22:22:23 - Got message [4|1300|1||UPDATE|1100|28]
-22:22:25 - Sending message [4|1300|3|1100|UPDATE|1200|48]
-22:22:31 - Got message [24|1400|0||NEW_NODE|1100|28]
-22:22:32 - Sending message [28|1100|4||WELCOME|1400|24]
-22:22:33 - Got message [24|1400|1||UPDATE|1100|28]
-22:22:33 - Sending message [24|1400|5|1100|UPDATE|1200|48]
-22:22:48 - Got message [0|1600|2|1300,1400|UPDATE|1100|28]
-22:22:48 - Sending message [0|1600|6|1300,1400,1100|UPDATE|1200|48]
-22:23:00 - [MARKET-LIST] item_id:100 name:"apple" qty:5
-22:23:00 - Pausing for 40000 ms
-22:23:01 - Sending message [28|1100|8||LIST_ITEM_INDEX|1100|28]
-22:23:01 - Got message [28|1100|8||LIST_ITEM_INDEX|1100|28]
-22:23:01 - Sending message [28|1100|7||LIST_ITEM_BACKUP|1200|48]
-
-22:23:13 - Got message [24|1400|3||LIST_ITEM_INDEX|1100|28]
-22:23:16 - Got message [4|1300|6||SUBSCRIBE_REQUEST|1100|28]
-
-22:23:16 - Node 4 (port 1300) subscribed to us.
-22:23:26 - Got message [0|1600|4||SUBSCRIBE_REQUEST|1100|28]
-22:23:26 - Node 0 (port 1600) subscribed to us.
-
-22:23:40 - [MARKET-LIST] item_id:300 name:"banana" qty:4
-22:23:40 - Pausing for 90000 ms
-22:23:41 - Sending message [28|1100|12||LIST_ITEM_INDEX|1200|48]
-22:23:41 - Sending message [28|1100|9||MARKET_NOTIFICATION|1300|4]
-22:23:41 - Sending message [28|1100|11||LIST_ITEM_BACKUP|1200|48]
-22:23:41 - Sending message [28|1100|10||MARKET_NOTIFICATION|1600|0]
-22:23:57 - Got message [24|1400|5||BUY_OWNER_LOOKUP|1100|28]
-22:23:57 - Got message [24|1400|6||BUY_OWNER_LOOKUP|1100|28]
-22:23:57 - Sending message [28|1100|13||BUY_OWNER_LOOKUP|1200|48]
-22:23:58 - Sending message [28|1100|14||BUY_OWNER_LOOKUP|1200|48]
-22:23:59 - Got message [24|1400|7||MUTEX_REQUEST|1100|28]
-22:24:00 - Sending message [28|1100|15||MUTEX_TOKEN|1400|24]
-22:24:00 - Got message [4|1300|9||MUTEX_REQUEST|1100|28]
-22:24:01 - Got message [24|1400|11||BUY_EXEC|1100|28]
-22:24:02 - Sending message [28|1100|17||BUY_EXEC_REPLY|1400|24]
-22:24:02 - Sending message [28|1100|16||BACKUP_QTY_UPDATE|1200|48]
-22:24:04 - Got message [24|1400|13||SEARCH_LOOKUP|1100|28]
-22:24:05 - Got message [4|1300|12||BUY_EXEC|1100|28]
-22:24:05 - Sending message [28|1100|18||SEARCH_LOOKUP_REPLY|1600|0]
-22:24:06 - Sending message [28|1100|19||BUY_EXEC_REPLY|1300|4]
-22:24:06 - Got message [0|1600|6||AD_FETCH|1100|28]
-22:24:06 - Sending message [28|1100|20||AD_FETCH_REPLY|1600|0]
-22:24:54 - Got message [48|1200|14||AD_FETCH|1100|28]
-22:24:55 - Sending message [28|1100|21||AD_FETCH_REPLY|1200|48]
-22:25:10 - Stopping...
+18:40:00 - Starting servent [28|localhost|1100]
+18:40:00 - Pausing for 60000 ms
+18:40:00 - First node in Chord system.
+18:40:10 - Got message [48|1200|0||NEW_NODE|1100|28]
+18:40:11 - Sending message [28|1100|0||WELCOME|1200|48]
+18:40:13 - Got message [48|1200|1||UPDATE|1100|28]
+18:40:13 - [SYS-NEIGHBORS] my_id:28 neighbors:48,48;
+18:40:13 - Sending message [48|1200|1|1100|UPDATE|1200|48]
+18:40:22 - Got message [4|1300|2||NEW_NODE|1100|28]
+18:40:23 - Sending message [28|1100|2||WELCOME|1300|4]
+18:40:24 - Got message [4|1300|1||UPDATE|1100|28]
+18:40:25 - Sending message [4|1300|3|1100|UPDATE|1200|48]
+18:40:32 - Got message [24|1400|2||NEW_NODE|1100|28]
+18:40:32 - Sending message [28|1100|4||WELCOME|1400|24]
+18:40:34 - Got message [24|1400|1||UPDATE|1100|28]
+18:40:34 - Sending message [24|1400|5|1100|UPDATE|1200|48]
+18:40:40 - Got message [0|1600|0||NEW_NODE|1100|28]
+18:40:41 - Sending message [0|1600|6||NEW_NODE|1200|48]
+18:40:45 - Got message [0|1600|2|1300,1400|UPDATE|1100|28]
+18:40:46 - Sending message [0|1600|7|1300,1400,1100|UPDATE|1200|48]
+18:41:00 - [MARKET-LIST] item_id:100 name:"apple" qty:5
+18:41:00 - Pausing for 40000 ms
+18:41:00 - Sending message [28|1100|9||NAME_INDEX_STORE|1100|28]
+18:41:00 - Got message [28|1100|9||NAME_INDEX_STORE|1100|28]
+18:41:01 - Sending message [28|1100|8||LIST_ITEM_BACKUP|1200|48]
+18:41:13 - Got message [24|1400|3||NAME_INDEX_STORE|1100|28]
+18:41:15 - Got message [4|1300|7||SUBSCRIBE_REQUEST|1100|28]
+18:41:15 - Node 4 (port 1300) subscribed to us.
+18:41:26 - Got message [0|1600|4||SUBSCRIBE_REQUEST|1100|28]
+18:41:26 - Node 0 (port 1600) subscribed to us.
+18:41:40 - [MARKET-LIST] item_id:300 name:"banana" qty:4
+18:41:40 - Pausing for 90000 ms
+18:41:41 - Sending message [28|1100|13||NAME_INDEX_STORE|1200|48]
+18:41:41 - Sending message [28|1100|11||MARKET_NOTIFICATION|1600|0]
+18:41:41 - Sending message [28|1100|12||LIST_ITEM_BACKUP|1200|48]
+18:41:41 - Sending message [28|1100|10||MARKET_NOTIFICATION|1300|4]
+18:41:56 - Got message [24|1400|5||BUY_OWNER_LOOKUP|1100|28]
+18:41:56 - Got message [24|1400|6||BUY_OWNER_LOOKUP|1100|28]
+18:41:57 - Sending message [28|1100|14||BUY_OWNER_LOOKUP|1200|48]
+18:41:57 - Sending message [28|1100|15||BUY_OWNER_LOOKUP|1200|48]
+18:41:59 - Got message [24|1400|7||MUTEX_REQUEST|1100|28]
+18:42:00 - Got message [4|1300|10||MUTEX_REQUEST|1100|28]
+18:42:00 - Sending message [28|1100|16||MUTEX_TOKEN|1400|24]
+18:42:02 - Got message [24|1400|11||BUY_EXEC|1100|28]
+18:42:03 - Sending message [28|1100|18||BUY_EXEC_REPLY|1400|24]
+18:42:03 - Sending message [28|1100|17||BACKUP_QTY_UPDATE|1200|48]
+18:42:03 - Got message [24|1400|12||SEARCH_LOOKUP|1100|28]
+18:42:04 - Got message [4|1300|13||BUY_EXEC|1100|28]
+18:42:05 - Sending message [28|1100|19||SEARCH_LOOKUP_REPLY|1600|0]
+18:42:05 - Sending message [28|1100|20||BUY_EXEC_REPLY|1300|4]
+18:42:06 - Got message [0|1600|6||AD_FETCH|1100|28]
+18:42:07 - Sending message [28|1100|21||AD_FETCH_REPLY|1600|0]
+18:42:52 - Got message [48|1200|14||AD_FETCH|1100|28]
+18:42:53 - Sending message [28|1100|22||AD_FETCH_REPLY|1200|48]
+18:43:10 - Stopping...

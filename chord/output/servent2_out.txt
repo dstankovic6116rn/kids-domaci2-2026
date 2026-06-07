@@ -1,36 +1,38 @@
-22:22:20 - Starting servent [4|localhost|1300]
-22:22:20 - Pausing for 55000 ms
-22:22:21 - Sending message [4|1300|0||NEW_NODE|1200|48]
-22:22:23 - Got message [28|1100|2||WELCOME|1300|4]
-22:22:23 - Sending message [4|1300|1||UPDATE|1100|28]
-22:22:25 - Got message [4|1300|3|1100,1200|UPDATE|1300|4]
-22:22:25 - [SYS-NEIGHBORS] my_id:4 neighbors:48,28;
-22:22:34 - Got message [24|1400|4|1100,1200|UPDATE|1300|4]
-22:22:35 - Sending message [24|1400|2|1100,1200,1300|UPDATE|1400|24]
-22:22:43 - Got message [0|1600|5||NEW_NODE|1300|4]
-22:22:44 - Sending message [4|1300|3||WELCOME|1600|0]
-22:22:45 - Got message [0|1600|1||UPDATE|1300|4]
-22:22:47 - Sending message [0|1600|4|1300|UPDATE|1400|24]
-22:23:12 - Got message [0|1600|2||LIST_ITEM_BACKUP|1300|4]
-22:23:13 - Sending message [4|1300|5||LIST_ITEM_BACKUP|1400|24]
-22:23:15 - Sent subscribe request to node 28 (port 1100).
-22:23:15 - Pausing for 40000 ms
-22:23:16 - Sending message [4|1300|6||SUBSCRIBE_REQUEST|1100|28]
-22:23:41 - Got message [28|1100|9||MARKET_NOTIFICATION|1300|4]
-22:23:41 - [MARKET-NOTIFICATION] node:28 posted item_id:300
-22:23:55 - Pausing for 75000 ms
-22:23:56 - Sending message [4|1300|7||BUY_OWNER_LOOKUP|1400|24]
-22:23:59 - Got message [24|1400|10||MUTEX_REQUEST|1300|4]
-22:23:59 - Got message [48|1200|10||BUY_OWNER_REPLY|1300|4]
-22:23:59 - [MUTEX-REQUEST] item_id:100
-22:24:00 - Sending message [4|1300|8||MUTEX_REQUEST|1400|24]
-22:24:00 - Sending message [4|1300|10||MUTEX_REQUEST|1200|48]
-22:24:00 - Sending message [4|1300|11||MUTEX_REQUEST|1600|0]
-22:24:00 - Sending message [4|1300|9||MUTEX_REQUEST|1100|28]
-22:24:03 - Got message [24|1400|12||MUTEX_TOKEN|1300|4]
-22:24:03 - [MUTEX-ACQUIRED]
-22:24:05 - Sending message [4|1300|12||BUY_EXEC|1100|28]
-22:24:06 - Got message [28|1100|19||BUY_EXEC_REPLY|1300|4]
-22:24:06 - [MARKET-BUY-FAIL] item_id:100 reason:OUT_OF_STOCK
-22:24:06 - [MUTEX-RELEASED]
-22:25:10 - Stopping...
+18:40:20 - Starting servent [4|localhost|1300]
+18:40:20 - Pausing for 55000 ms
+18:40:21 - Sending message [4|1300|0||NEW_NODE|1200|48]
+18:40:23 - Got message [28|1100|2||WELCOME|1300|4]
+18:40:24 - Sending message [4|1300|1||UPDATE|1100|28]
+18:40:26 - Got message [4|1300|3|1100,1200|UPDATE|1300|4]
+18:40:26 - [SYS-NEIGHBORS] my_id:4 neighbors:48,28;
+18:40:31 - Got message [24|1400|0||NEW_NODE|1300|4]
+18:40:32 - Sending message [24|1400|2||NEW_NODE|1100|28]
+18:40:35 - Got message [24|1400|4|1100,1200|UPDATE|1300|4]
+18:40:36 - Sending message [24|1400|3|1100,1200,1300|UPDATE|1400|24]
+18:40:42 - Got message [0|1600|5||NEW_NODE|1300|4]
+18:40:43 - Sending message [4|1300|4||WELCOME|1600|0]
+18:40:44 - Got message [0|1600|1||UPDATE|1300|4]
+18:40:44 - Sending message [0|1600|5|1300|UPDATE|1400|24]
+18:41:12 - Got message [0|1600|3||LIST_ITEM_BACKUP|1300|4]
+18:41:13 - Sending message [4|1300|6||LIST_ITEM_BACKUP|1400|24]
+18:41:15 - Sent subscribe request to node 28 (port 1100).
+18:41:15 - Pausing for 40000 ms
+18:41:15 - Sending message [4|1300|7||SUBSCRIBE_REQUEST|1100|28]
+18:41:41 - Got message [28|1100|10||MARKET_NOTIFICATION|1300|4]
+18:41:41 - [MARKET-NOTIFICATION] node:28 posted item_id:300
+18:41:55 - Pausing for 75000 ms
+18:41:55 - Sending message [4|1300|8||BUY_OWNER_LOOKUP|1400|24]
+18:41:58 - Got message [48|1200|10||BUY_OWNER_REPLY|1300|4]
+18:41:58 - [MUTEX-REQUEST] item_id:100
+18:41:59 - Sending message [4|1300|9||MUTEX_REQUEST|1400|24]
+18:41:59 - Got message [24|1400|10||MUTEX_REQUEST|1300|4]
+18:41:59 - Sending message [4|1300|12||MUTEX_REQUEST|1600|0]
+18:41:59 - Sending message [4|1300|11||MUTEX_REQUEST|1200|48]
+18:42:00 - Sending message [4|1300|10||MUTEX_REQUEST|1100|28]
+18:42:03 - Got message [24|1400|13||MUTEX_TOKEN|1300|4]
+18:42:03 - [MUTEX-ACQUIRED]
+18:42:04 - Sending message [4|1300|13||BUY_EXEC|1100|28]
+18:42:05 - Got message [28|1100|20||BUY_EXEC_REPLY|1300|4]
+18:42:05 - [MARKET-BUY-FAIL] item_id:100 reason:OUT_OF_STOCK
+18:42:05 - [MUTEX-RELEASED]
+18:43:10 - Stopping...
