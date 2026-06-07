@@ -6,8 +6,8 @@ import servent.message.Message;
 import servent.message.MessageType;
 
 /**
- * Backup qty sync — at the responsible node, overwrite the backup ad's
- * quantity.  Otherwise forward closer to the owner of hash(itemId).
+ * Overwrite the backup ads quantity. Otherwise forward closer to the owner of
+ * hash(itemId).
  */
 public class BackupQtyUpdateHandler implements MessageHandler {
 
