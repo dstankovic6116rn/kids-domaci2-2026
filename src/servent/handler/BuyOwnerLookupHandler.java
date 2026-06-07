@@ -6,8 +6,8 @@ import servent.message.Message;
 import servent.message.MessageType;
 
 /**
- * Routes a buyer's owner-lookup query toward the Chord-responsible backup
- * node.  Delegates the routing+reply decision to ChordState.
+ * Routes a buyers owner lookup query to the Chord responsible backup
+ * node.
  */
 public class BuyOwnerLookupHandler implements MessageHandler {
 

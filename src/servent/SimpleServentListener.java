@@ -39,16 +39,17 @@ import servent.message.util.MessageUtil;
 public class SimpleServentListener implements Runnable, Cancellable {
 
 	private volatile boolean working = true;
-	
+
 	public SimpleServentListener() {
-		
+
 	}
 
 	/*
-	 * Thread pool for executing the handlers. Each client will get it's own handler thread.
+	 * Thread pool for executing the handlers. Each client will get it's own handler
+	 * thread.
 	 */
 	private final ExecutorService threadPool = Executors.newWorkStealingPool();
-	
+
 	@Override
 	public void run() {
 		ServerSocket listenerSocket = null;
@@ -62,99 +63,98 @@ public class SimpleServentListener implements Runnable, Cancellable {
 			AppConfig.timestampedErrorPrint("Couldn't open listener socket on: " + AppConfig.myServentInfo.getListenerPort());
 			System.exit(0);
 		}
-		
-		
+
 		while (working) {
 			try {
 				Message clientMessage;
-				
+
 				Socket clientSocket = listenerSocket.accept();
-				
-				//GOT A MESSAGE! <3
+
+				// GOT A MESSAGE! <3
 				clientMessage = MessageUtil.readMessage(clientSocket);
-				
+
 				MessageHandler messageHandler = new NullHandler(clientMessage);
-				
+
 				/*
 				 * Each message type has it's own handler.
 				 * If we can get away with stateless handlers, we will,
 				 * because that way is much simpler and less error prone.
 				 */
 				switch (clientMessage.getMessageType()) {
-				case NEW_NODE:
-					messageHandler = new NewNodeHandler(clientMessage);
-					break;
-				case WELCOME:
-					messageHandler = new WelcomeHandler(clientMessage);
-					break;
-				case SORRY:
-					messageHandler = new SorryHandler(clientMessage);
-					break;
-				case UPDATE:
-					messageHandler = new UpdateHandler(clientMessage);
-					break;
-				case PUT:
-					messageHandler = new PutHandler(clientMessage);
-					break;
-				case ASK_GET:
-					messageHandler = new AskGetHandler(clientMessage);
-					break;
-				case TELL_GET:
-					messageHandler = new TellGetHandler(clientMessage);
-					break;
-				case LIST_ITEM_BACKUP:
-					messageHandler = new ListItemBackupHandler(clientMessage);
-					break;
-				case NAME_INDEX_STORE:
-					messageHandler = new NameIndexStoreHandler(clientMessage);
-					break;
-				case SEARCH_LOOKUP:
-					messageHandler = new SearchLookupHandler(clientMessage);
-					break;
-				case SEARCH_LOOKUP_REPLY:
-					messageHandler = new SearchLookupReplyHandler(clientMessage);
-					break;
-				case AD_FETCH:
-					messageHandler = new AdFetchHandler(clientMessage);
-					break;
-				case AD_FETCH_REPLY:
-					messageHandler = new AdFetchReplyHandler(clientMessage);
-					break;
-				case SUBSCRIBE_REQUEST:
-					messageHandler = new SubscribeRequestHandler(clientMessage);
-					break;
-				case MARKET_NOTIFICATION:
-					messageHandler = new MarketNotificationHandler(clientMessage);
-					break;
-				case BUY_OWNER_LOOKUP:
-					messageHandler = new BuyOwnerLookupHandler(clientMessage);
-					break;
-				case BUY_OWNER_REPLY:
-					messageHandler = new BuyOwnerReplyHandler(clientMessage);
-					break;
-				case MUTEX_REQUEST:
-					messageHandler = new MutexRequestHandler(clientMessage);
-					break;
-				case MUTEX_TOKEN:
-					messageHandler = new MutexTokenHandler(clientMessage);
-					break;
-				case BUY_EXEC:
-					messageHandler = new BuyExecHandler(clientMessage);
-					break;
-				case BUY_EXEC_REPLY:
-					messageHandler = new BuyExecReplyHandler(clientMessage);
-					break;
-				case BACKUP_QTY_UPDATE:
-					messageHandler = new BackupQtyUpdateHandler(clientMessage);
-					break;
-				case POISON:
-					break;
+					case NEW_NODE:
+						messageHandler = new NewNodeHandler(clientMessage);
+						break;
+					case WELCOME:
+						messageHandler = new WelcomeHandler(clientMessage);
+						break;
+					case SORRY:
+						messageHandler = new SorryHandler(clientMessage);
+						break;
+					case UPDATE:
+						messageHandler = new UpdateHandler(clientMessage);
+						break;
+					case PUT:
+						messageHandler = new PutHandler(clientMessage);
+						break;
+					case ASK_GET:
+						messageHandler = new AskGetHandler(clientMessage);
+						break;
+					case TELL_GET:
+						messageHandler = new TellGetHandler(clientMessage);
+						break;
+					case LIST_ITEM_BACKUP:
+						messageHandler = new ListItemBackupHandler(clientMessage);
+						break;
+					case NAME_INDEX_STORE:
+						messageHandler = new NameIndexStoreHandler(clientMessage);
+						break;
+					case SEARCH_LOOKUP:
+						messageHandler = new SearchLookupHandler(clientMessage);
+						break;
+					case SEARCH_LOOKUP_REPLY:
+						messageHandler = new SearchLookupReplyHandler(clientMessage);
+						break;
+					case AD_FETCH:
+						messageHandler = new AdFetchHandler(clientMessage);
+						break;
+					case AD_FETCH_REPLY:
+						messageHandler = new AdFetchReplyHandler(clientMessage);
+						break;
+					case SUBSCRIBE_REQUEST:
+						messageHandler = new SubscribeRequestHandler(clientMessage);
+						break;
+					case MARKET_NOTIFICATION:
+						messageHandler = new MarketNotificationHandler(clientMessage);
+						break;
+					case BUY_OWNER_LOOKUP:
+						messageHandler = new BuyOwnerLookupHandler(clientMessage);
+						break;
+					case BUY_OWNER_REPLY:
+						messageHandler = new BuyOwnerReplyHandler(clientMessage);
+						break;
+					case MUTEX_REQUEST:
+						messageHandler = new MutexRequestHandler(clientMessage);
+						break;
+					case MUTEX_TOKEN:
+						messageHandler = new MutexTokenHandler(clientMessage);
+						break;
+					case BUY_EXEC:
+						messageHandler = new BuyExecHandler(clientMessage);
+						break;
+					case BUY_EXEC_REPLY:
+						messageHandler = new BuyExecReplyHandler(clientMessage);
+						break;
+					case BACKUP_QTY_UPDATE:
+						messageHandler = new BackupQtyUpdateHandler(clientMessage);
+						break;
+					case POISON:
+						break;
 				}
-				
+
 				threadPool.submit(messageHandler);
 			} catch (SocketTimeoutException timeoutEx) {
-				//Uncomment the next line to see that we are waking up every second.
-//				AppConfig.timedStandardPrint("Waiting...");
+				// Uncomment the next line to see that we are waking up every second.
+				// AppConfig.timedStandardPrint("Waiting...");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

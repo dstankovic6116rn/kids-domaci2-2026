@@ -6,11 +6,10 @@ import servent.message.Message;
 import servent.message.MessageType;
 
 /**
- * Owner-side execution of a buyer's BUY_EXEC.  Atomically checks stock and
+ * Owner execution of a buyer's BUY_EXEC. Atomically checks stock and
  * replies with success or OUT_OF_STOCK via BUY_EXEC_REPLY.
  *
- * The mutex guarantees only one in-flight BUY_EXEC per item at a time, so
- * no additional locking is needed here.
+ * The mutex guarantees only one BUY_EXEC per item at a time.
  */
 public class BuyExecHandler implements MessageHandler {
 

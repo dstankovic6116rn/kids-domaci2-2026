@@ -12,11 +12,11 @@ import servent.message.util.MessageUtil;
  * Handles an AD_FETCH message on the owner node.
  *
  * A searching node sent this after receiving a SEARCH_LOOKUP_REPLY — it wants
- * the live details of a specific ad.  We look the ad up in myAds and reply
+ * the live details of a specific ad. We look the ad up in myAds and reply
  * directly to originPort with an AdFetchReplyMessage.
  *
  * ad may be null if the item was removed between index lookup and this fetch
- * (race condition).  The null case is passed on to the reply so the receiver
+ * (race condition). The null case is passed on to the reply so the receiver
  * can log an appropriate message.
  */
 public class AdFetchHandler implements MessageHandler {

@@ -5,23 +5,18 @@ import java.util.List;
 import app.NameIndexEntry;
 
 /**
- * Reply to a SearchLookupMessage.  Sent directly (in one hop) from the
- * name-index node back to the original searching node (originPort).
- *
- * Contains all NameIndexEntries whose name matches the search term exactly.
- * The receiver (SearchLookupReplyHandler) then contacts each entry's owner
- * directly with an AdFetchMessage to retrieve the live ad details and qty.
- *
- * An empty entries list means no matching ads exist in the network.
+ * Reply to a SearchLookupMessage. Sent directly to the node that searched.
+ * The receiver then contacts each entrys owner
+ * directly with AdFetchMessage to retrieve the live ad details and qty.
  */
 public class SearchLookupReplyMessage extends BasicMessage {
 
 	private static final long serialVersionUID = 1L;
 
-	// The search term that was originally queried — kept for context/logging.
+	// Search term
 	private final String name;
 
-	// All NameIndexEntries whose name matches exactly (pre-filtered by the sender).
+	// All NameIndexEntries whose name matches
 	private final List<NameIndexEntry> entries;
 
 	public SearchLookupReplyMessage(int senderPort, int receiverPort, String name, List<NameIndexEntry> entries) {
@@ -30,6 +25,11 @@ public class SearchLookupReplyMessage extends BasicMessage {
 		this.entries = entries;
 	}
 
-	public String getName() { return name; }
-	public List<NameIndexEntry> getEntries() { return entries; }
+	public String getName() {
+		return name;
+	}
+
+	public List<NameIndexEntry> getEntries() {
+		return entries;
+	}
 }

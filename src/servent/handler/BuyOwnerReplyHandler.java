@@ -7,12 +7,12 @@ import servent.message.Message;
 import servent.message.MessageType;
 
 /**
- * Owner-lookup reply received at the buyer.  Stashes the resolved owner
- * port into the per-item mutex state and proceeds with the Suzuki-Kasami
- * REQUEST phase.
+ * Owner lookup reply received at the buyer. Stashes the resolved owner
+ * port into the per item mutex state and proceeds with the Suzuki-Kasami
+ * REQUEST.
  *
- * If the lookup failed (ownerPort == -1), print [MARKET-BUY-FAIL] and
- * clear the pending state — the buy never enters the mutex.
+ * If the lookup failed print [MARKET-BUY-FAIL] and
+ * clear the pending state and buy never enters the mutex.
  */
 public class BuyOwnerReplyHandler implements MessageHandler {
 

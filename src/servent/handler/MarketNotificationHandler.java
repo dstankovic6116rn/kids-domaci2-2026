@@ -8,8 +8,8 @@ import servent.message.MessageType;
 /**
  * Handles a MARKET_NOTIFICATION message on a subscriber node.
  *
- * Received when a publisher node (one we subscribed to) creates a new ad.
- * Prints the required [MARKET-NOTIFICATION] line to stdout.
+ * Received when a publisher node creates a new ad.
+ * Prints the required [MARKET-NOTIFICATION].
  */
 public class MarketNotificationHandler implements MessageHandler {
 

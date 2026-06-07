@@ -6,8 +6,7 @@ import servent.message.MessageType;
 import servent.message.MutexRequestMessage;
 
 /**
- * Suzuki-Kasami REQUEST receipt: update RN[from] and conditionally forward
- * the token if we hold it.  All logic lives in ChordState.handleMutexRequest.
+ * Suzuki-Kasami REQUEST receipt.
  */
 public class MutexRequestHandler implements MessageHandler {
 

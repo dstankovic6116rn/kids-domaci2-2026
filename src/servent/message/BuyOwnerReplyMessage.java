@@ -1,11 +1,8 @@
 package servent.message;
 
 /**
- * Reply to BuyOwnerLookupMessage.  Sent directly from the backup node back to
- * the buyer (originPort in the request).
- *
- * ownerPort == -1 means no backup was found for this itemId — the buyer
- * treats this as a buy failure.
+ * Reply to BuyOwnerLookupMessage. Sent directly from the backup node back to
+ * the buyer, originPort in the request.
  */
 public class BuyOwnerReplyMessage extends BasicMessage {
 
@@ -20,6 +17,11 @@ public class BuyOwnerReplyMessage extends BasicMessage {
 		this.ownerPort = ownerPort;
 	}
 
-	public int getItemId() { return itemId; }
-	public int getOwnerPort() { return ownerPort; }
+	public int getItemId() {
+		return itemId;
+	}
+
+	public int getOwnerPort() {
+		return ownerPort;
+	}
 }

@@ -6,7 +6,7 @@ import servent.message.Message;
 import servent.message.MessageType;
 
 /**
- * Buyer-side: owner has responded with success or OUT_OF_STOCK.
+ * Buyer side - owner has responded with success or OUT_OF_STOCK.
  * Prints the result line and exits the critical section.
  */
 public class BuyExecReplyHandler implements MessageHandler {

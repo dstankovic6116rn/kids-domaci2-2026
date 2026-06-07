@@ -8,14 +8,7 @@ import servent.message.MessageType;
 /**
  * Handles a SUBSCRIBE_REQUEST message on the publisher node.
  *
- * When node B wants to follow node A, B sends this message to A.
- * A registers B's ServentInfo in its local subscribers set so that
- * future list_item calls on A will notify B.
- *
- * The subscriber's identity is taken from getSenderPort() — no extra
- * payload needed since all nodes are on localhost.
- *
- * Duplicate subscriptions are silently ignored (Set semantics in ChordState).
+ * The subscriberss identity is taken from getSenderPort().
  */
 public class SubscribeRequestHandler implements MessageHandler {
 

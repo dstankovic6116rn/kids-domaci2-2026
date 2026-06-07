@@ -4,13 +4,8 @@ import app.Ad;
 
 /**
  * Sent by the owner of an ad toward the node that is responsible for
- * hash(itemId) in the Chord ring.  That node stores the Ad as a backup copy.
- *
- * Routing: the message is forwarded hop-by-hop (see ListItemBackupHandler)
- * until it reaches the node whose key range includes hash(itemId).
- *
- * The Ad payload is carried as a typed Serializable field rather than encoded
- * in messageText, so product names with special characters never break parsing.
+ * hash(itemId) in the Chord ring.
+ * Forwarded hop-by-hop.
  */
 public class ListItemBackupMessage extends BasicMessage {
 
@@ -24,5 +19,7 @@ public class ListItemBackupMessage extends BasicMessage {
 		this.ad = ad;
 	}
 
-	public Ad getAd() { return ad; }
+	public Ad getAd() {
+		return ad;
+	}
 }

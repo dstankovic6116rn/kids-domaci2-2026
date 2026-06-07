@@ -3,11 +3,8 @@ package servent.message;
 import app.MutexToken;
 
 /**
- * Carries a Suzuki-Kasami token from the previous holder to the next
- * grantee.  Sent in one direct hop — no Chord routing involved.
- *
- * Receipt of this message at the buyer is the trigger to enter the
- * critical section.
+ * Carries a Suzuki-Kasami token from the previous holder to the next.
+ * Sent in one direct hop, no Chord routing.
  */
 public class MutexTokenMessage extends BasicMessage {
 
@@ -20,5 +17,7 @@ public class MutexTokenMessage extends BasicMessage {
 		this.token = token;
 	}
 
-	public MutexToken getToken() { return token; }
+	public MutexToken getToken() {
+		return token;
+	}
 }

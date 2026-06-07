@@ -6,7 +6,7 @@ public enum MessageType {
 	SEARCH_LOOKUP, SEARCH_LOOKUP_REPLY,
 	AD_FETCH, AD_FETCH_REPLY,
 	SUBSCRIBE_REQUEST, MARKET_NOTIFICATION,
-	// Buy mutex (Suzuki-Kasami) + execution + backup sync.
+	// Buy mutex Suzuki-Kasami
 	BUY_OWNER_LOOKUP, BUY_OWNER_REPLY,
 	MUTEX_REQUEST, MUTEX_TOKEN,
 	BUY_EXEC, BUY_EXEC_REPLY,

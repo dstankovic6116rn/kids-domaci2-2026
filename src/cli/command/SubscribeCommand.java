@@ -6,20 +6,7 @@ import servent.message.SubscribeRequestMessage;
 import servent.message.util.MessageUtil;
 
 /**
- * CLI command: subscribe [host:port]
- *
- * Subscribes THIS node to the node at the given address.
- * After subscribing, whenever that remote node lists a new item, this node
- * will receive a MARKET_NOTIFICATION and print [MARKET-NOTIFICATION].
- *
- * What happens:
- * 1. Parse "host:port" from args.
- * 2. Send a SUBSCRIBE_REQUEST directly to that node.
- * 3. The remote node (SubscribeRequestHandler) stores us in its subscribers
- * set.
- *
- * Example: subscribe localhost:1200
- * (Subscribe this node to the node listening on port 1200.)
+ * subscribe [host:port]
  */
 public class SubscribeCommand implements CLICommand {
 
@@ -34,7 +21,7 @@ public class SubscribeCommand implements CLICommand {
 			AppConfig.timestampedErrorPrint("Usage: subscribe [host:port]");
 			return;
 		}
-		// Split on the last ':' to handle IPv6 or "localhost:PORT" alike.
+		// Split on the last : to handle localhost:PORT.
 		int colonPos = args.lastIndexOf(':');
 		if (colonPos == -1) {
 			AppConfig.timestampedErrorPrint("Usage: subscribe [host:port]");

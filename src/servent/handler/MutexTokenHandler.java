@@ -6,7 +6,7 @@ import servent.message.MessageType;
 import servent.message.MutexTokenMessage;
 
 /**
- * Token arrival — stash it and, if a buy is pending, enter the CS.
+ * Token arrival. Stash it and if a buy is pending enter the CS.
  */
 public class MutexTokenHandler implements MessageHandler {
 

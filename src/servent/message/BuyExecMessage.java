@@ -1,11 +1,8 @@
 package servent.message;
 
 /**
- * Sent by the buyer (inside its critical section) directly to the item
- * owner to actually decrement the stock.  The mutex guarantees that only
- * one BuyExecMessage per item is in flight at any time.
- *
- * originPort tells the owner where to reply.
+ * Sent by the buyer in its critical section directly to the item
+ * owner to decrement stock.
  */
 public class BuyExecMessage extends BasicMessage {
 
@@ -22,7 +19,15 @@ public class BuyExecMessage extends BasicMessage {
 		this.originPort = originPort;
 	}
 
-	public int getItemId() { return itemId; }
-	public int getQty() { return qty; }
-	public int getOriginPort() { return originPort; }
+	public int getItemId() {
+		return itemId;
+	}
+
+	public int getQty() {
+		return qty;
+	}
+
+	public int getOriginPort() {
+		return originPort;
+	}
 }

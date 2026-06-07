@@ -2,12 +2,7 @@ package servent.message;
 
 /**
  * Sent by the owner after a successful buy, routed via Chord to the node
- * responsible for hash(itemId), to keep the backup copy's quantity in
- * sync with the master.
- *
- * If a fault-tolerance promotion ever happens (owner dies, backup takes
- * over), the backup is now up to date.  Forwarded hop-by-hop like
- * LIST_ITEM_BACKUP.
+ * responsible for hash(itemId)
  */
 public class BackupQtyUpdateMessage extends BasicMessage {
 
@@ -22,6 +17,11 @@ public class BackupQtyUpdateMessage extends BasicMessage {
 		this.newQty = newQty;
 	}
 
-	public int getItemId() { return itemId; }
-	public int getNewQty() { return newQty; }
+	public int getItemId() {
+		return itemId;
+	}
+
+	public int getNewQty() {
+		return newQty;
+	}
 }

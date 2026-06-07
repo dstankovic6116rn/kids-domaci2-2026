@@ -1,12 +1,7 @@
 package servent.message;
 
 /**
- * Owner's response to BuyExecMessage.
- *
- *   success == true  -> qty was sufficient, owner has decremented the master
- *                       copy.  remainingQty is the new stock value.
- *   success == false -> qty was insufficient; nothing changed.  The buyer
- *                       prints [MARKET-BUY-FAIL] item_id:X reason:OUT_OF_STOCK.
+ * Owners response to BuyExecMessage.
  */
 public class BuyExecReplyMessage extends BasicMessage {
 
@@ -26,8 +21,19 @@ public class BuyExecReplyMessage extends BasicMessage {
 		this.success = success;
 	}
 
-	public int getItemId() { return itemId; }
-	public int getQtyBought() { return qtyBought; }
-	public int getRemainingQty() { return remainingQty; }
-	public boolean isSuccess() { return success; }
+	public int getItemId() {
+		return itemId;
+	}
+
+	public int getQtyBought() {
+		return qtyBought;
+	}
+
+	public int getRemainingQty() {
+		return remainingQty;
+	}
+
+	public boolean isSuccess() {
+		return success;
+	}
 }

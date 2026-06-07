@@ -8,24 +8,15 @@ import servent.message.BuyOwnerLookupMessage;
 import servent.message.util.MessageUtil;
 
 /**
- * CLI command: buy [item_id] [quantity]
+ * buy [item_id] [quantity]
  *
- * Distributed mutex-protected stock decrement.  The flow:
- *
- *   1. Validate args.
- *   2. Resolve the owner port:
- *        - if THIS node owns the item (myAds) -> skip lookup.
- *        - elif THIS node holds the backup    -> read ownerPort from backupAd.
- *        - else                               -> route BUY_OWNER_LOOKUP via
- *                                                Chord; BuyOwnerReplyHandler
- *                                                resumes once the reply lands.
- *   3. With owner port known, call chordState.requestBuyMutex(itemId, qty,
- *      ownerPort) which prints [MUTEX-REQUEST] and broadcasts the Suzuki-
- *      Kasami REQUEST (or enters the CS immediately if we already hold the
- *      token).
- *
- * All later prints — [MUTEX-ACQUIRED], [MARKET-BUY-*], [MUTEX-RELEASED] —
- * are emitted from ChordState as the protocol progresses.
+ * Distributed mutex-protected stock decrement. The flow:
+ * if this node owns the item -> skip lookup.
+ * elif this node holds the backup -> read ownerPort from backupAd.
+ * else -> route BUY_OWNER_LOOKUP via Chord BuyOwnerReplyHandler
+ * 
+ * call requestBuyMutex -> prints [MUTEX-REQUEST] and broadcasts the Suzuki-
+ * Kasami REQUEST
  */
 public class BuyCommand implements CLICommand {
 
@@ -61,11 +52,7 @@ public class BuyCommand implements CLICommand {
 
 		int myPort = AppConfig.myServentInfo.getListenerPort();
 
-		// Always discover the owner via the Chord-routed lookup, even when
-		// we ourselves are the owner or hold the backup.  The message
-		// loops back via TCP and BuyOwnerLookupHandler answers normally.
-		// No local shortcuts — guarantees the operation goes through the
-		// network as required.
+		// Always discover the owner via the Chord-routed lookup.
 		ItemMutexState state = AppConfig.chordState.getOrCreateMutexState(itemId);
 		synchronized (state) {
 			state.myPendingQty = qty;

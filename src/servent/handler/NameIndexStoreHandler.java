@@ -10,16 +10,11 @@ import servent.message.util.MessageUtil;
 /**
  * Handles a NAME_INDEX_STORE message.
  *
- * Goal: append a NameIndexEntry to the name index on the node whose Chord key
- * range contains hash(productName).  This makes the product findable by
- * "search name" — the search command routes to the same key.
+ * Append a NameIndexEntry to the name index on the node whose Chord key
+ * range contains hash(productName). This makes the product findable by search.
  *
- * Decision logic:
- *   - If THIS node owns nameKey -> append the entry to the local nameIndex map.
- *   - Otherwise -> forward one hop closer using getNextNodeForKey.
- *
- * Same Chord forwarding pattern as ListItemBackupHandler, just for a different
- * key (hash of the product name instead of hash of the itemId).
+ * If THIS node owns nameKey -> append the entry to the local nameIndex map.
+ * Otherwise -> forward one hop closer.
  */
 public class NameIndexStoreHandler implements MessageHandler {
 

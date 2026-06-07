@@ -1,12 +1,8 @@
 package servent.message;
 
 /**
- * Sent by a buyer toward the Chord-responsible backup node for an item, to
- * discover which node is the master owner.  Routed hop-by-hop until it
- * reaches the node that holds the backup copy of the ad.
- *
- * originPort is the buyer (carried through forwards so the reply can come
- * back in one direct hop).
+ * Sent by a buyer to the responsible backup node for an item, to
+ * discover which node is the master owner. Routed hop-by-hop.
  */
 public class BuyOwnerLookupMessage extends BasicMessage {
 
@@ -21,6 +17,11 @@ public class BuyOwnerLookupMessage extends BasicMessage {
 		this.originPort = originPort;
 	}
 
-	public int getItemId() { return itemId; }
-	public int getOriginPort() { return originPort; }
+	public int getItemId() {
+		return itemId;
+	}
+
+	public int getOriginPort() {
+		return originPort;
+	}
 }

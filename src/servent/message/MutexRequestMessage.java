@@ -1,17 +1,11 @@
 package servent.message;
 
 /**
- * Suzuki-Kasami REQUEST(itemId, requesterPort, seq).
+ * Suzuki-Kasami REQUEST itemId, requesterPort, seq.
  *
- * Broadcast by a buyer to every other node when it wants to enter the CS
- * for `itemId`.  Each receiver updates its local RN[requesterPort] = max(...).
+ * Broadcast by a buyer to every other node when it wants to enter the CS.
  * Whoever currently holds the token, after the update, may forward the
- * token to the requester if the requester's seq matches LN[requester]+1
- * (Suzuki-Kasami forwarding condition).
- *
- * requesterPort is carried explicitly even though it usually equals
- * senderPort — this way the message stays self-contained and immune to
- * intermediate-rewrite bugs.
+ * token to the requester.
  */
 public class MutexRequestMessage extends BasicMessage {
 
@@ -28,7 +22,15 @@ public class MutexRequestMessage extends BasicMessage {
 		this.seq = seq;
 	}
 
-	public int getItemId() { return itemId; }
-	public int getRequesterPort() { return requesterPort; }
-	public int getSeq() { return seq; }
+	public int getItemId() {
+		return itemId;
+	}
+
+	public int getRequesterPort() {
+		return requesterPort;
+	}
+
+	public int getSeq() {
+		return seq;
+	}
 }
